@@ -1,0 +1,50 @@
+### --- Docker & Environment ---
+# Локальные переменные окружения (секреты, пароли, ключи)
+.env
+.env.*
+!.env.example
+
+# Локальные переопределения Docker Compose
+docker-compose.override.yml
+
+# Локальные данные баз данных (чтобы не забить гит гигабайтами БД)
+.docker_data/
+postgres_data/
+mysql_data/
+mongo_data/
+
+
+### --- Node.js / Frontend (если используется) ---
+node_modules/
+/dist
+/build
+.npm
+package-lock.json (опционально, но часто оставляют)
+
+
+### --- Python (если используется) ---
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+
+### --- Логи и временные файлы ---
+*.log
+logs/
+.tmp/
+.cache/
+
+
+### --- Системные файлы ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
