@@ -2,7 +2,7 @@ services:
 
   mysql:
     image: mysql:9.6
-    container_name: shop_mysql
+    container_name: shop_mysql-l
     restart: always
     environment:
       MYSQL_ROOT_PASSWORD: 123456
@@ -69,7 +69,7 @@ services:
 
   phpmyadmin:
     image: phpmyadmin:latest
-    container_name: shop_pma
+    container_name: shop_pma-l
     restart: always
     environment:
       PMA_HOST: mysql
@@ -84,7 +84,7 @@ services:
 
   redis:
     image: redis:8.8.0
-    container_name: shop_redis
+    container_name: shop_redis-l
     restart: always
     ports:
       - "6379:6379"

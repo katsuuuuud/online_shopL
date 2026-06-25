@@ -7,7 +7,7 @@
     <title>@yield('title', 'SHOP')</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@700&family=Mulish:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="{{ asset('css/style.css') }}">
 </head>
 <body class="@yield('body-class')">
 
@@ -16,12 +16,12 @@
     <span class="header-meta">@yield('header-meta', 'КАТАЛОГ')</span>
 
     @auth
-        <a class="btn-cart" href="/cart">Корзина</a>
-        <a class="btn-cart" href="/profile">Кабинет</a>
-        <a class="btn-cart" href="/auth/logout">Выйти</a>
+        <a class="btn-cart" href="{{ asset('cart') }}">Корзина</a>
+        <a class="btn-cart" href="{{ asset('profile') }}">Кабинет</a>
+        <a class="btn-cart" href="{{ asset('auth/logout') }}">Выйти</a>
     @else
-        <a class="btn-cart" href="/cart">Корзина</a>
-        <a class="btn-cart" href="/auth/login">Войти</a>
+        <a class="btn-cart" href="{{ asset('cart') }}">Корзина</a>
+        <a class="btn-cart" href="{{ asset('auth/login') }}">Войти</a>
     @endauth
 </header>
 
@@ -29,7 +29,7 @@
 
 <footer>© 2026 Shop</footer>
 
-<script src="/js/main.js"></script>
+<script src="{{ asset('js/main.js') }}"></script>
 @yield('scripts')
 </body>
 </html>

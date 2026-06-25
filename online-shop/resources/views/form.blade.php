@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('app')
 
 @section('title', 'Авторизация')
 @section('body-class', 'auth-page')
@@ -7,6 +7,8 @@
 @section('content')
     <main>
         <div class="auth-box">
+            <a href="/" class="back-home">←</a>
+
             <h1>Авторизация</h1>
 
             @if($error)

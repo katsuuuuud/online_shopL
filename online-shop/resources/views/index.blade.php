@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('app')
 
 @section('title', 'Корзина')
 @section('header-meta', auth()->check() ? 'Привет, ' . auth()->user()->name : 'КОРЗИНА')
@@ -6,6 +6,8 @@
 @section('content')
     <div class="wrapper">
         <main>
+            <a href="/" class="back-home">←</a>
+
             <div class="section-head">
                 <h1>Корзина</h1>
             </div>

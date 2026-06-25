@@ -1,4 +1,4 @@
-@extends('layouts.app')
+@extends('app')
 
 @section('title', 'Личный кабинет')
 @section('body-class', 'profile-page')
@@ -6,6 +6,8 @@
 
 @section('content')
     <main>
+        <a href="/" class="back-home">←</a>
+
         <div class="profile-layout">
             <aside class="profile-nav">
                 <a href="/profile?tab=info"

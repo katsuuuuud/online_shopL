@@ -21,6 +21,7 @@ RUN apt-get install -y wget unzip curl
 RUN curl -sS https://getcomposer.org/installer |php
 RUN mv composer.phar /usr/local/bin/composer
 
+RUN pecl install redis && docker-php-ext-enable redis
 COPY ./conf.d /usr/local/etc/php/conf.d/
 
 WORKDIR /var/www
