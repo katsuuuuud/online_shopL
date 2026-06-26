@@ -68,7 +68,6 @@ class CartController extends Controller
             'total' => $this->calcTotal($items),
         ], 201);
 
-        // Если гость без куки — устанавливаем куку с guestId
         if (! $userId && $guestId && ! $request->cookie('guest_cart_id')) {
             $response->withCookie(cookie('guest_cart_id', $guestId, 43200)); // 30 дней
         }
@@ -106,7 +105,6 @@ class CartController extends Controller
         $userId  = Auth::id();
         $guestId = $request->cookie('guest_cart_id');
 
-        // Если гость без куки — генерируем UUID
         if (! $userId && ! $guestId) {
             $guestId = (string) Str::uuid();
         }

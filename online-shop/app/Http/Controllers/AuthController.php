@@ -79,7 +79,6 @@ class AuthController extends Controller
             ->withCookie(cookie()->forget('guest_cart_id'));
     }
 
-    // ──────────────────────── API ────────────────────────
 
     public function apiLogin(Request $request)
     {

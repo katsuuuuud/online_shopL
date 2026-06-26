@@ -19,7 +19,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Compiled View Path
+    | Compiled View Path+++
     |--------------------------------------------------------------------------
     |
     | This option determines where all the compiled Blade templates will be

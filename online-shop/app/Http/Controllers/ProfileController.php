@@ -10,7 +10,6 @@ class ProfileController extends Controller
 {
     public function __construct(private ProfileService $profileService) {}
 
-    // ──────────────────────── Web ────────────────────────
 
     public function show(Request $request)
     {
@@ -44,7 +43,6 @@ class ProfileController extends Controller
         return redirect('/profile?tab=' . urlencode($tab) . '&success=' . urlencode($result['message']));
     }
 
-    // ──────────────────────── API ────────────────────────
 
     public function apiUpdate(Request $request)
     {
