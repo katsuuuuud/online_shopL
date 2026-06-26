@@ -35,9 +35,9 @@
                 @foreach($products as $product)
                     @php
                         $productId   = $product['productId']   ?? $product->productId;
-                        $name        = $product['name']        ?? $product->name;
+                        $name        = $product['name'];
                         $categoryName= $product['category_name'] ?? '—';
-                        $hasDiscount = $product['has_discount'] ?? $product->has_discount ?? false;
+                        $hasDiscount = $product['has_discount'] ?? false;
                         $price       = $product['price']       ?? null;
                         $currency    = $product['currency']    ?? null;
                     @endphp

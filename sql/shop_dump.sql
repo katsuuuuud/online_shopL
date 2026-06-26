@@ -108,32 +108,6 @@ INSERT INTO `categories` VALUES (1,'Accessories','fashion accessories'),(2,'Elec
 /*!40000 ALTER TABLE `categories` ENABLE KEYS */;
 UNLOCK TABLES;
 
---
--- Table structure for table `customers`
---
-
-DROP TABLE IF EXISTS `customers`;
-/*!40101 SET @saved_cs_client     = @@character_set_client */;
-/*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `customers` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `name` varchar(100) NOT NULL,
-  `email` varchar(100) NOT NULL,
-  `phone` varchar(50) NOT NULL,
-  `created_at` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=10 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-/*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `customers`
---
-
-LOCK TABLES `customers` WRITE;
-/*!40000 ALTER TABLE `customers` DISABLE KEYS */;
-INSERT INTO `customers` VALUES (1,'vdfgs','bfdb@fgfdg.cpm','bfdbfd','2026-06-12 00:48:35'),(2,'╨Т╨░╨╗╨╡╤А╨░','val@gdfs.com','2154656678','2026-06-12 00:57:40'),(3,'╨Т╨░╨╗╨╡╤А╨░','val@gdfs.com','2154656678','2026-06-12 00:58:27'),(8,'apchi','apchi@cought.com','6676711037','2026-06-12 09:13:15');
-/*!40000 ALTER TABLE `customers` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `discounts`
@@ -209,7 +183,7 @@ CREATE TABLE `order_items` (
   `customer_id` int NOT NULL,
   `quantity` int NOT NULL,
   `price` decimal(10,2) NOT NULL,
-  `currency` varchar(10) NOT NULL DEFAULT 'RUB',
+  `currency` varchar(10) NOT NULL DEFAULT 'USD',
   PRIMARY KEY (`order_item_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=32 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;

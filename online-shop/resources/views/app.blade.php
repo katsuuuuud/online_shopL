@@ -16,12 +16,12 @@
     <span class="header-meta">@yield('header-meta', 'КАТАЛОГ')</span>
 
     @auth
-        <a class="btn-cart" href="{{ asset('cart') }}">Корзина</a>
-        <a class="btn-cart" href="{{ asset('profile') }}">Кабинет</a>
-        <a class="btn-cart" href="{{ asset('auth/logout') }}">Выйти</a>
+        <a class="btn-cart" href="{{ url('cart') }}">Корзина</a>
+        <a class="btn-cart" href="{{ url('profile') }}">Кабинет</a>
+        <a class="btn-cart" href="{{ url('auth/logout') }}">Выйти</a>
     @else
-        <a class="btn-cart" href="{{ asset('cart') }}">Корзина</a>
-        <a class="btn-cart" href="{{ asset('auth/login') }}">Войти</a>
+        <a class="btn-cart" href="{{ url('cart') }}">Корзина</a>
+        <a class="btn-cart" href="{{ url('auth/login') }}">Войти</a>
     @endauth
 </header>
 

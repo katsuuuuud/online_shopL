@@ -33,7 +33,7 @@
                             @foreach($orders as $order)
                                 <li class="order-card">
                                     <div><strong>Заказ #</strong>{{ $order->orderId }}</div>
-                                    <div><strong>Дата:</strong> {{ $order->created_at }}</div>
+                                    <div><strong>Дата:</strong> {{ $order->created_at -> format('d.m.Y')}}</div>
                                     <div><strong>Сумма:</strong> {{ number_format($order->amount, 2) }}</div>
                                     <div><strong>Статус:</strong> {{ $order->status }}</div>
                                     <div><strong>Адрес:</strong> {{ $order->address }}</div>

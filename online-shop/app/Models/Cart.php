@@ -9,9 +9,6 @@ class Cart extends Model
     protected $table = 'carts';
     protected $primaryKey = 'cartId';
 
-    const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'updated_at';
-
     protected $fillable = ['user_id'];
 
     public function user()
