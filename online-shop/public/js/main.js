@@ -6,7 +6,6 @@ const api = {
         };
         if (body) opts.body = JSON.stringify(body);
 
-        // Add CSRF token from meta tag
         const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
         if (csrfToken) {
             opts.headers['X-CSRF-TOKEN'] = csrfToken;
