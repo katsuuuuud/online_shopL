@@ -1,7 +1,6 @@
 <?php
 
 namespace App\Repositories;
-
 use App\Contracts\CartRepositoryInterface;
 use App\Models\Cart;
 use App\Models\CartItem;
@@ -117,7 +116,6 @@ class CartRepository implements CartRepositoryInterface
         Redis::del(self::GUEST_KEY_PREFIX . $guestId);
     }
 
-    // ─── Helpers ─────────────────────────────────────────────────────────────
 
     private function ensureCartForUser(int $userId): int
     {
