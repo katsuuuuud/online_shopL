@@ -9,9 +9,8 @@ class CatalogController extends Controller
 {
     public function __construct(private CatalogService $catalogService) {}
 
-    public function showProducts(Request $request)
+    public function showProducts(?int $categoryId = null)
     {
-        $categoryId  = $request->query('category') ? (int) $request->query('category') : null;
         $catalogData = $this->catalogService->getProductsForCatalog($categoryId);
 
         return view('catalog', [
