@@ -15,7 +15,7 @@
                 </li>
                 @foreach($categories as $cat)
                     <li>
-                        <a href="/?category={{ $cat['categoryId'] ?? $cat->categoryId }}"
+                        <a href="/category/{{ $cat['categoryId'] ?? $cat->categoryId }}"
                            class="{{ $activeCategoryId === ($cat['categoryId'] ?? $cat->categoryId) ? 'active' : '' }}">
                             <span class="cat-dot"></span>
                             {{ $cat['name'] ?? $cat->name }}
