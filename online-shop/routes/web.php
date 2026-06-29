@@ -19,6 +19,7 @@ Route::post('/auth/login', [AuthController::class, 'handleLogin'])->name('auth.l
 Route:: post('auth/register', [AuthController:: class, 'handleRegister'])->name('auth.register');
 Route:: get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 Route:: post('/profile', [ProfileController:: class, 'handleUpdate'])->name('profile.update');
-Route::get('/{any}', [CatalogController::class, 'showProducts'])
-    ->where('any', '.*')
-    ->name('catalog');
+Route::get('/', [CatalogController::class, 'showProducts'])->name('catalog.index');
+Route::get('/category/{categoryId}', [CatalogController::class, 'showProducts'])
+    ->whereNumber('categoryId')
+    ->name('catalog.category');
