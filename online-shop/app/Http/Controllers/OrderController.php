@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
-use App\Services\OrderService;
+use App\Actions\CreateOrderAction;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
-    public function __construct(private OrderService $orderService) {}
+    public function __construct(private CreateOrderAction $createOrderAction) {}
 
     public function apiCreate(Request $request)
     {
@@ -17,7 +17,7 @@ class OrderController extends Controller
         }
 
         $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->orderService->createOrder(Auth::user(), $guestId);
+        $result  = $this->createOrderAction->execute(Auth::user(), $guestId);
 
         if (! $result['success']) {
             return response()->json(['error' => $result['message']], 422);

@@ -1,19 +1,21 @@
 <?php
 
-namespace App\Services;
+namespace App\Actions;
 
 use App\Contracts\CartRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
+use App\Contracts\ProductAuditRepositoryInterface;
 use Illuminate\Support\Facades\DB;
 
-class OrderService
+class CreateOrderAction
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
-        private CartRepositoryInterface  $cartRepository,
+        private CartRepositoryInterface $cartRepository,
+        private ProductAuditRepositoryInterface $productAuditRepository,
     ) {}
 
-    public function createOrder(object $user, ?string $guestId): array
+    public function execute(object $user, ?string $guestId): array
     {
         $userId    = $user->userId;
         $cartItems = $this->cartRepository->getItems($userId, $guestId);
@@ -38,13 +40,7 @@ class OrderService
                     throw new \RuntimeException('Некорректные данные товара в корзине.');
                 }
 
-                $updated = DB::update(
-                    'UPDATE product_audit SET quantity = quantity - ?
-                     WHERE product_id = ? AND quantity >= ?',
-                    [$quantity, $productId, $quantity]
-                );
-
-                if ($updated === 0) {
+                if (! $this->productAuditRepository->decrementStock($productId, $quantity)) {
                     throw new \RuntimeException(
                         'Извините, товар "' . ($item['name'] ?? 'товар') . '" закончился'
                     );

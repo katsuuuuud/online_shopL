@@ -20,6 +20,5 @@ Route:: post('auth/register', [AuthController:: class, 'handleRegister'])->name(
 Route:: get('/profile', [ProfileController::class, 'show'])->name('profile.show');
 Route:: post('/profile', [ProfileController:: class, 'handleUpdate'])->name('profile.update');
 Route::get('/', [CatalogController::class, 'showProducts'])->name('catalog.index');
-Route::get('/category/{categoryId}', [CatalogController::class, 'showProducts'])
-    ->whereNumber('categoryId')
+Route::get('/category/{categoryId}', [CatalogController::class, 'showProductsByCategory'])
     ->name('catalog.category');
