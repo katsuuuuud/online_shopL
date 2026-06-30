@@ -61,7 +61,7 @@
                                 —
                             @endif
                         </span>
-                            <button type="button" class="btn-cart add-to-cart"
+                            <button type="button" class="btn add-to-cart"
                                     data-product-id="{{ $productId }}">+</button>
                         </div>
                     </div>

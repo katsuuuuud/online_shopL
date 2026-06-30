@@ -30,7 +30,7 @@
                         <input type="hidden" name="next" value="{{ $next }}">
                         <input type="email"    name="email"    placeholder="Email"  required>
                         <input type="password" name="password" placeholder="Пароль" required>
-                        <button type="submit" class="btn-cart">Войти</button>
+                        <button type="submit" class="btn">Войти</button>
                     </form>
                 </div>
             @else
@@ -44,7 +44,7 @@
                         <input type="text"     name="phone"    placeholder="Телефон" required>
                         <input type="text"     name="address"  placeholder="Адрес"   required>
                         <input type="password" name="password" placeholder="Пароль"  required>
-                        <button type="submit" class="btn-cart">Зарегистрироваться</button>
+                        <button type="submit" class="btn">Зарегистрироваться</button>
                     </form>
                 </div>
             @endif

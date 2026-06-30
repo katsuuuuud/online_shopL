@@ -51,7 +51,7 @@ function updateCartDOM(items, total) {
     list.innerHTML = items.map(item => `
         <li class="cart-item" data-id="${item.productId}">
             <span>${item.name} — ${item.quantity} шт.</span>
-            <button type="button" class="btn-cart remove-from-cart"
+            <button type="button" class="btn remove-from-cart"
                     data-product-id="${item.productId}">Удалить</button>
         </li>
     `).join('');

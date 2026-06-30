@@ -62,7 +62,7 @@
                             Адрес
                             <input type="text" name="address" value="{{ $user->address }}" required>
                         </label>
-                        <button type="submit" class="btn-cart">Сохранить</button>
+                        <button type="submit" class="btn">Сохранить</button>
                     </form>
                 @endif
             </section>

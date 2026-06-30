@@ -204,7 +204,7 @@ main { padding: 40px 0 0 40px; }
     color: var(--accent);
 }
 
-.btn-cart {
+.btn {
     background: transparent;
     border: 1px solid var(--border);
     color: var(--muted);
@@ -220,7 +220,7 @@ main { padding: 40px 0 0 40px; }
     text-decoration: none;
 }
 
-.btn-cart:hover {
+.btn:hover {
     background: var(--accent);
     border-color: var(--accent);
     color: #0d0d0d;
