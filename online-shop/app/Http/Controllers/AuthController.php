@@ -21,7 +21,7 @@ class AuthController extends Controller
         $next  = $request->query('next', '/');
         $error = $request->query('error', '');
 
-        return view('form', compact('mode', 'next', 'error'));
+        return view('auth', compact('mode', 'next', 'error'));
     }
 
     public function showRegister(Request $request)
@@ -34,7 +34,7 @@ class AuthController extends Controller
         $next  = $request->query('next', '/');
         $error = $request->query('error', '');
 
-        return view('form', compact('mode', 'next', 'error'));
+        return view('auth', compact('mode', 'next', 'error'));
     }
 
     public function handleLogin(Request $request)

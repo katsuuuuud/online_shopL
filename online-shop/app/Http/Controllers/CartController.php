@@ -22,7 +22,7 @@ class CartController extends Controller
         [$userId, $guestId] = $this->resolveIds($request);
         $items = $this->cartRepo->getItems($userId, $guestId);
 
-        return view('index', compact('items'));
+        return view('cart', compact('items'));
     }
 
     // ──────────────────────── API ────────────────────────

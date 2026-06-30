@@ -24,13 +24,13 @@ class ProfileController extends Controller
         $data    = $this->profileService->getProfileData($user);
         $orders  = $data['orders'];
 
-        return view('show', compact('tab', 'error', 'success', 'user', 'orders'));
+        return view('profile', compact('tab', 'error', 'success', 'user', 'orders'));
     }
 
     public function handleUpdate(Request $request)
     {
         if (! Auth::check()) {
-            return redirect('/auth/login?next=/profile');
+            return redirect()->route('auth.login.form', ['next' => '/profile']);
         }
 
         $tab    = $request->input('tab', 'info');
