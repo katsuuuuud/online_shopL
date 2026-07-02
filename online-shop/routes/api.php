@@ -13,7 +13,6 @@ Route::middleware('web')->group(function () {
     Route::delete('/cart/{productId}', [CartController::class, 'apiRemove']);
     Route::post('/auth/login', [AuthController::class, 'apiLogin']);
     Route::post('/auth/register', [AuthController::class, 'apiRegister']);
-    Route::delete('/auth/session', [AuthController::class, 'apiLogout']);
     Route::post('/orders', [OrderController::class, 'apiCreate'])->middleware('auth');
     Route::patch('/profile', [ProfileController::class, 'apiUpdate'])->name('profile.update')->middleware('auth');
 });

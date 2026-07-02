@@ -26,12 +26,8 @@ class ProfileController extends Controller
 
     public function apiUpdate(Request $request)
     {
-        $dto    = ProfileUpdateDTO::fromArray($request->all());
-        $result = $this->profileService->updateProfile($dto, Auth::user());
-
-        if (! $result->success) {
-            return response()->json(['error' => $result->message], 422);
-        }
+        $dto = ProfileUpdateDTO::fromArray($request->all());
+        $this->profileService->updateProfile($dto, Auth::user());
 
         return response()->json(['data' => Auth::user()]);
     }

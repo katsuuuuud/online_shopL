@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Services\AuthService;
+use App\Services\LoginDTO;
+use App\Services\RegisterDTO;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -29,38 +31,6 @@ class AuthController extends Controller
         return view('auth', compact('mode', 'next', 'error'));
     }
 
-    public function handleLogin(Request $request)
-    {
-        $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->login($request->all(), $guestId);
-        $next    = $result['next'] ?? '/';
-
-        if ($result['success']) {
-            return redirect($next);
-        }
-
-        return redirect('/auth/login?' . http_build_query([
-                'next'  => $next,
-                'error' => $result['message'],
-            ]));
-    }
-
-    public function handleRegister(Request $request)
-    {
-        $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->register($request->all(), $guestId);
-        $next    = $result['next'] ?? '/';
-
-        if ($result['success']) {
-            return redirect($next);
-        }
-
-        return redirect('/auth/register?' . http_build_query([
-                'next'  => $next,
-                'error' => $result['message'],
-            ]));
-    }
-
     public function logout(Request $request)
     {
         $this->authService->logout();
@@ -75,11 +45,7 @@ class AuthController extends Controller
     public function apiLogin(Request $request)
     {
         $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->login($request->all(), $guestId);
-
-        if (! $result['success']) {
-            return response()->json(['error' => $result['message']], 401);
-        }
+        $this->authService->login(LoginDTO::fromArray($request->all()), $guestId);
 
         return response()->json(['data' => Auth::user()]);
     }
@@ -87,21 +53,8 @@ class AuthController extends Controller
     public function apiRegister(Request $request)
     {
         $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->register($request->all(), $guestId);
-
-        if (! $result['success']) {
-            return response()->json(['error' => $result['message']], 422);
-        }
+        $this->authService->register(RegisterDTO::fromArray($request->all()), $guestId);
 
         return response()->json(['data' => Auth::user()], 201);
-    }
-
-    public function apiLogout(Request $request)
-    {
-        $this->authService->logout();
-        $request->session()->invalidate();
-
-        return response()->json(['data' => null])
-            ->withCookie(cookie()->forget('guest_cart_id'));
     }
 }

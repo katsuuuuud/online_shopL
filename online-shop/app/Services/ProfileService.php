@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\OrderRepositoryInterface;
+use App\Exceptions\DomainException;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Collection;
 
@@ -12,10 +13,10 @@ class ProfileService
         private OrderRepositoryInterface $orderRepository,
     ) {}
 
-    public function updateProfile(ProfileUpdateDTO $dto, User $user): ProfileUpdateResultDTO
+    public function updateProfile(ProfileUpdateDTO $dto, User $user): void
     {
         if (! $dto->isValid()) {
-            return ProfileUpdateResultDTO::failure('Все поля профиля должны быть заполнены.');
+            throw new DomainException('Все поля профиля должны быть заполнены.');
         }
 
         try {
@@ -24,10 +25,8 @@ class ProfileService
             $user->address = $dto->address;
             $user->save();
         } catch (\Throwable $e) {
-            return ProfileUpdateResultDTO::failure('Ошибка обновления профиля: ' . $e->getMessage());
+            throw new DomainException('Ошибка обновления профиля: ' . $e->getMessage());
         }
-
-        return ProfileUpdateResultDTO::success('Профиль успешно обновлён.');
     }
 
     public function getProfileData(User $user): ProfileDataDTO
@@ -58,24 +57,6 @@ class ProfileUpdateDTO
     public function isValid(): bool
     {
         return $this->name !== '' && $this->phone !== '' && $this->address !== '';
-    }
-}
-
-class ProfileUpdateResultDTO
-{
-    private function __construct(
-        public readonly bool $success,
-        public readonly string $message,
-    ) {}
-
-    public static function success(string $message): self
-    {
-        return new self(success: true, message: $message);
-    }
-
-    public static function failure(string $message): self
-    {
-        return new self(success: false, message: $message);
     }
 }
 

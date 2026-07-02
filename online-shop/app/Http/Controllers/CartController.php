@@ -25,10 +25,6 @@ class CartController extends Controller
 
         $result = $this->cartService->addItem($request, $productId, $quantity);
 
-        if (! $result['success']) {
-            return response()->json(['error' => $result['message']], $result['status']);
-        }
-
         $response = response()->json([
             'data'  => $result['items'],
             'total' => $result['total'],

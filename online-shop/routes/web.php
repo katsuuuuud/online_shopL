@@ -15,8 +15,6 @@ Route::get('/auth', function () {
 })->name('auth.redirect');
 Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
 Route:: get('/auth/register', [AuthController::class, 'showRegister'])->name('auth.register.form')->middleware('guest');
-Route::post('/auth/login', [AuthController::class, 'handleLogin'])->name('auth.login');
-Route:: post('auth/register', [AuthController:: class, 'handleRegister'])->name('auth.register');
 Route:: get('/profile', [ProfileController::class, 'show'])->name('profile.show')->middleware('auth');
 Route::get('/', [CatalogController::class, 'showProducts'])->name('catalog.index');
 Route::get('/category/{categoryId}', [CatalogController::class, 'showProductsByCategory'])

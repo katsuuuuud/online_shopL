@@ -15,12 +15,8 @@ class OrderController extends Controller
     public function apiCreate(Request $request): JsonResponse
     {
         $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->createOrderAction->execute(Auth::user(), $guestId);
+        $orderId = $this->createOrderAction->execute(Auth::user(), $guestId);
 
-        if (! $result['success']) {
-            return response()->json(['error' => $result['message']], ResponseAlias::HTTP_UNPROCESSABLE_ENTITY);
-        }
-
-        return response()->json(['data' => ['orderId' => $result['orderId']]], ResponseAlias::HTTP_CREATED);
+        return response()->json(['data' => ['orderId' => $orderId]], ResponseAlias::HTTP_CREATED);
     }
 }

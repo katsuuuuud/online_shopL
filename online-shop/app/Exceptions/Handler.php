@@ -26,5 +26,11 @@ class Handler extends ExceptionHandler
         $this->reportable(function (Throwable $e) {
             //
         });
+
+        $this->renderable(function (DomainException $e, $request) {
+            if ($request->expectsJson() || $request->is('api/*')) {
+                return response()->json(['error' => $e->getMessage()], $e->getStatus());
+            }
+        });
     }
 }

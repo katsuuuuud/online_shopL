@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Contracts\CartRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
 use App\Contracts\ProductAuditRepositoryInterface;
+use App\Exceptions\DomainException;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -16,13 +17,13 @@ class CreateOrderAction
         private ProductAuditRepositoryInterface $productAuditRepository,
     ) {}
 
-    public function execute(User $user, ?string $guestId): array
+    public function execute(User $user, ?string $guestId): int
     {
         $userId    = $user->userId;
         $cartItems = $this->cartRepository->getItems($userId, $guestId);
 
         if (empty($cartItems)) {
-            return ['success' => false, 'message' => 'Корзина пуста.'];
+            throw new DomainException('Корзина пуста.');
         }
 
         $address     = $user->address ?? '';
@@ -54,11 +55,11 @@ class CreateOrderAction
 
             DB::commit();
 
-            return ['success' => true, 'message' => 'Заказ успешно оформлен.', 'orderId' => $orderId];
+            return $orderId;
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return ['success' => false, 'message' => 'Не удалось оформить заказ: ' . $e->getMessage()];
+            throw new DomainException('Не удалось оформить заказ: ' . $e->getMessage());
         }
     }
 }

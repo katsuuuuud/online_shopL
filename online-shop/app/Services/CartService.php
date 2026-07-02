@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Contracts\CartRepositoryInterface;
 use App\Contracts\CatalogRepositoryInterface;
+use App\Exceptions\DomainException;
 use App\Helpers\Helper;
 use Illuminate\Http\Request;
 
@@ -31,7 +32,7 @@ class CartService
     {
         $product = $this->catalogRepo->getProductById($productId);
         if (! $product) {
-            return ['success' => false, 'message' => 'Товар не найден', 'status' => 404];
+            throw new DomainException('Товар не найден', 404);
         }
 
         $priceData = $this->catalogRepo->getActivePrice($productId);
@@ -46,7 +47,6 @@ class CartService
         );
 
         return [
-            'success' => true,
             'items'   => array_values($items),
             'total'   => Helper::calcTotal($items),
             'guestId' => $guestId,
