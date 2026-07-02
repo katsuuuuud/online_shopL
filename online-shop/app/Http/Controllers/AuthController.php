@@ -13,10 +13,6 @@ class AuthController extends Controller
 
     public function showLogin(Request $request)
     {
-        if (Auth::check()) {
-            return redirect('/');
-        }
-
         $mode  = 'login';
         $next  = $request->query('next', '/');
         $error = $request->query('error', '');
@@ -26,10 +22,6 @@ class AuthController extends Controller
 
     public function showRegister(Request $request)
     {
-        if (Auth::check()) {
-            return redirect('/');
-        }
-
         $mode  = 'register';
         $next  = $request->query('next', '/');
         $error = $request->query('error', '');

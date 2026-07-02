@@ -3,7 +3,8 @@
 namespace App\Services;
 
 use App\Contracts\OrderRepositoryInterface;
-use Illuminate\Support\Facades\Auth;
+use App\Models\User;
+use Illuminate\Database\Eloquent\Collection;
 
 class ProfileService
 {
@@ -11,32 +12,76 @@ class ProfileService
         private OrderRepositoryInterface $orderRepository,
     ) {}
 
-    public function updateProfile(array $data, object $user): array
+    public function updateProfile(ProfileUpdateDTO $dto, User $user): ProfileUpdateResultDTO
     {
-        $name    = trim((string) ($data['name']    ?? ''));
-        $phone   = trim((string) ($data['phone']   ?? ''));
-        $address = trim((string) ($data['address'] ?? ''));
-
-        if ($name === '' || $phone === '' || $address === '') {
-            return ['success' => false, 'message' => 'Все поля профиля должны быть заполнены.'];
+        if (! $dto->isValid()) {
+            return ProfileUpdateResultDTO::failure('Все поля профиля должны быть заполнены.');
         }
 
         try {
-            $user->name    = $name;
-            $user->phone   = $phone;
-            $user->address = $address;
+            $user->name    = $dto->name;
+            $user->phone   = $dto->phone;
+            $user->address = $dto->address;
             $user->save();
         } catch (\Throwable $e) {
-            return ['success' => false, 'message' => 'Ошибка обновления профиля: ' . $e->getMessage()];
+            return ProfileUpdateResultDTO::failure('Ошибка обновления профиля: ' . $e->getMessage());
         }
 
-        return ['success' => true, 'message' => 'Профиль успешно обновлён.'];
+        return ProfileUpdateResultDTO::success('Профиль успешно обновлён.');
     }
 
-    public function getProfileData(object $user): array
+    public function getProfileData(User $user): ProfileDataDTO
     {
-        return [
-            'orders' => $this->orderRepository->getOrdersByCustomer($user->userId),
-        ];
+        return new ProfileDataDTO(
+            orders: $this->orderRepository->getOrdersByCustomer($user->userId),
+        );
     }
+}
+
+class ProfileUpdateDTO
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly string $phone,
+        public readonly string $address,
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            name: trim((string) ($data['name'] ?? '')),
+            phone: trim((string) ($data['phone'] ?? '')),
+            address: trim((string) ($data['address'] ?? '')),
+        );
+    }
+
+    public function isValid(): bool
+    {
+        return $this->name !== '' && $this->phone !== '' && $this->address !== '';
+    }
+}
+
+class ProfileUpdateResultDTO
+{
+    private function __construct(
+        public readonly bool $success,
+        public readonly string $message,
+    ) {}
+
+    public static function success(string $message): self
+    {
+        return new self(success: true, message: $message);
+    }
+
+    public static function failure(string $message): self
+    {
+        return new self(success: false, message: $message);
+    }
+}
+
+class ProfileDataDTO
+{
+    public function __construct(
+        public readonly Collection $orders,
+    ) {}
 }

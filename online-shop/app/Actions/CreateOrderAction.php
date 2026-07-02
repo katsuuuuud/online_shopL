@@ -5,6 +5,7 @@ namespace App\Actions;
 use App\Contracts\CartRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
 use App\Contracts\ProductAuditRepositoryInterface;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
 class CreateOrderAction
@@ -15,7 +16,7 @@ class CreateOrderAction
         private ProductAuditRepositoryInterface $productAuditRepository,
     ) {}
 
-    public function execute(object $user, ?string $guestId): array
+    public function execute(User $user, ?string $guestId): array
     {
         $userId    = $user->userId;
         $cartItems = $this->cartRepository->getItems($userId, $guestId);

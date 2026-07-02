@@ -13,12 +13,11 @@ Route::get('/auth', function () {
     $target = '/auth/login' . ($next !== '/' ? '?next=' . urlencode($next) : '');
     return redirect($target);
 })->name('auth.redirect');
-Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('auth.login.form');
-Route:: get('/auth/register', [AuthController::class, 'showRegister'])->name('auth.register.form');
+Route::get('/auth/login', [AuthController::class, 'showLogin'])->name('login')->middleware('guest');
+Route:: get('/auth/register', [AuthController::class, 'showRegister'])->name('auth.register.form')->middleware('guest');
 Route::post('/auth/login', [AuthController::class, 'handleLogin'])->name('auth.login');
 Route:: post('auth/register', [AuthController:: class, 'handleRegister'])->name('auth.register');
-Route:: get('/profile', [ProfileController::class, 'show'])->name('profile.show');
-Route:: post('/profile', [ProfileController:: class, 'handleUpdate'])->name('profile.update');
+Route:: get('/profile', [ProfileController::class, 'show'])->name('profile.show')->middleware('auth');
 Route::get('/', [CatalogController::class, 'showProducts'])->name('catalog.index');
 Route::get('/category/{categoryId}', [CatalogController::class, 'showProductsByCategory'])
     ->name('catalog.category');

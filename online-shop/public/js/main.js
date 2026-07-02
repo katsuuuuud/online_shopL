@@ -162,7 +162,7 @@ async function onProfileUpdate(event) {
     submitBtn.disabled = true;
 
     try {
-        await api.patch('/api/profile', body);
+        await api.patch(form.dataset.url, body);
         showToast('Профиль успешно обновлён');
     } catch (e) {
         showToast(e.message, 'error');

@@ -43,9 +43,8 @@
                     @endif
                 @else
                     <h2>Профиль</h2>
-                    <form action="/profile" method="post" class="profile-form">
+                    <form class="profile-form" data-url="{{ $urlUpdate }}">
                         @csrf
-                        <input type="hidden" name="tab" value="info">
                         <label>
                             Имя
                             <input type="text" name="name" value="{{ $user->name }}" required>
