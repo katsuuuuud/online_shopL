@@ -26,6 +26,10 @@
                         @endforeach
                     </ul>
 
+                    <div class="cart-total">
+                        Итого: {{ number_format($total, 2) }} {{ $items[0]['currency'] ?? 'USD' }}
+                    </div>
+
                     <div class="cart-actions">
                         <button type="button" class="btn clear-cart">Очистить корзину</button>
                         @auth

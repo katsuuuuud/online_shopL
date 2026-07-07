@@ -16,7 +16,10 @@ class CartController extends Controller
     {
         $data = $this->cartService->getItems($request);
 
-        return view('cart', ['items' => $data['items']]);
+        return view('cart', [
+            'items' => $data['items'],
+            'total' => $data['total'],
+        ]);
     }
 
     public function apiAdd(AddCartItemRequest $request): JsonResponse

@@ -204,6 +204,14 @@ main { padding: 40px 0 0 40px; }
     color: var(--accent);
 }
 
+.price-old {
+    text-decoration: line-through;
+    color: var(--muted);
+    font-size: 0.85rem;
+    margin-right: 6px;
+    font-family: 'Unbounded', sans-serif;
+}
+
 .btn {
     background: transparent;
     border: 1px solid var(--border);

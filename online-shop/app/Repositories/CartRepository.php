@@ -4,7 +4,6 @@ namespace App\Repositories;
 use App\Contracts\CartRepositoryInterface;
 use App\Models\Cart;
 use App\Models\CartItem;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 class CartRepository implements CartRepositoryInterface
@@ -35,17 +34,21 @@ class CartRepository implements CartRepositoryInterface
         if ($userId) {
             $cartId = $this->ensureCartForUser($userId);
 
-            CartItem::upsert(
-                [[
+            $existing = CartItem::where('cart_id', $cartId)
+                ->where('product_id', $productId)
+                ->first();
+
+            if ($existing) {
+                $existing->increment('quantity', $quantity);
+            } else {
+                CartItem::create([
                     'cart_id'    => $cartId,
                     'product_id' => $productId,
                     'quantity'   => $quantity,
                     'price'      => $price,
                     'currency'   => $currency,
-                ]],
-                ['cart_id', 'product_id'],
-                ['quantity' => DB::raw('quantity + ?', [$quantity])]
-            );
+                ]);
+            }
 
             return $this->getItemsByCartId($cartId);
         }

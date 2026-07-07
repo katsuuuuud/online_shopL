@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\CatalogRepositoryInterface;
+use App\Helpers\Helper;
 
 class CatalogService
 {
@@ -25,12 +26,16 @@ class CatalogService
         $prices = $this->repo->getActivePrices($productIds);
 
         $products = $products->map(function ($product) use ($categoryMap, $prices) {
-            $price = $prices->get($product->productId);
+            $priceRow  = $prices->get($product->productId);
+            $basePrice = $priceRow ? (float) $priceRow->price : null;
+            $discountInfo = Helper::priceInfo($product, $basePrice);
 
             return array_merge($product->toArray(), [
-                'price'         => $price?->price,
-                'currency'      => $price?->currency,
-                'category_name' => $categoryMap[$product->category_id] ?? '—',
+                'price'          => $discountInfo['price'],
+                'original_price' => $discountInfo['original_price'],
+                'has_discount'   => $discountInfo['has_discount'],
+                'currency'       => $priceRow?->currency,
+                'category_name'  => $categoryMap[$product->category_id] ?? '—',
             ]);
         });
 
