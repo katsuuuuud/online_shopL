@@ -13,14 +13,19 @@ class CatalogService
     public function getProductsForCatalog(?int $categoryId): array
     {
         $categories = $this->repo->getCategories();
-        $products   = $categoryId
+
+        $products = $categoryId
             ? $this->repo->getProductsByCategory($categoryId)
             : $this->repo->getProducts();
 
         $categoryMap = $categories->keyBy('categoryId')->map->name;
 
-        $products = $products->map(function ($product) use ($categoryMap) {
-            $price = $this->repo->getActivePrice($product->productId);
+        $productIds = $products->pluck('productId')->all();
+
+        $prices = $this->repo->getActivePrices($productIds);
+
+        $products = $products->map(function ($product) use ($categoryMap, $prices) {
+            $price = $prices->get($product->productId);
 
             return array_merge($product->toArray(), [
                 'price'         => $price?->price,

@@ -1,16 +1,17 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\StorePostRequest;
 use App\Services\CatalogService;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class CatalogController extends Controller
 {
     public function __construct(private CatalogService $catalogService) {}
 
-    public function showProducts(Request $request)
+    public function showProducts(Request $request): View
     {
         $catalogData = $this->catalogService->getProductsForCatalog(null);
 
@@ -21,7 +22,7 @@ class CatalogController extends Controller
         ]);
     }
 
-    public function showProductsByCategory(StorePostRequest $request, int $categoryId)
+    public function showProductsByCategory(StorePostRequest $request, int $categoryId): View
     {
         $catalogData = $this->catalogService->getProductsForCatalog($categoryId);
 

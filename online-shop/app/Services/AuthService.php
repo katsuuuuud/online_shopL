@@ -16,10 +16,6 @@ class AuthService
 
     public function login(LoginDTO $dto, ?string $guestId): User
     {
-        if (! $dto->isValid()) {
-            throw new DomainException('Введите email и пароль.', 401);
-        }
-
         $user = User::where('email', $dto->email)->first();
 
         if (! $user || ! Hash::check($dto->password, $user->password)) {
@@ -35,10 +31,6 @@ class AuthService
 
     public function register(RegisterDTO $dto, ?string $guestId): User
     {
-        if (! $dto->isValid()) {
-            throw new DomainException('Заполните все поля для регистрации.', 422);
-        }
-
         if (User::where('email', $dto->email)->exists()) {
             throw new DomainException('Пользователь с таким email уже зарегистрирован.', 422);
         }
@@ -79,10 +71,6 @@ class LoginDTO
         );
     }
 
-    public function isValid(): bool
-    {
-        return $this->email !== '' && $this->password !== '';
-    }
 }
 
 class RegisterDTO
@@ -106,8 +94,4 @@ class RegisterDTO
         );
     }
 
-    public function isValid(): bool
-    {
-        return $this->name !== '' && $this->email !== '' && $this->phone !== '' && $this->address !== '' && $this->password !== '';
-    }
 }

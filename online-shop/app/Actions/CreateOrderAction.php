@@ -1,5 +1,5 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Actions;
 
 use App\Contracts\CartRepositoryInterface;
@@ -49,7 +49,7 @@ class CreateOrderAction
                 }
             }
 
-            $orderId = $this->orderRepository->saveOrder($userId, (int) round($totalAmount), $address);
+            $orderId = $this->orderRepository->saveOrder($userId, $totalAmount, $address);
             $this->orderRepository->saveOrderItems($orderId, $userId, $cartItems);
             $this->cartRepository->clear($userId, $guestId);
 
@@ -59,7 +59,8 @@ class CreateOrderAction
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw new DomainException('Не удалось оформить заказ: ' . $e->getMessage());
+            report($e);
+            throw new DomainException('Не удалось оформить заказ.');
         }
     }
 }

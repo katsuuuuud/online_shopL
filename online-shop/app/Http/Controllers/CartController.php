@@ -1,17 +1,18 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddCartItemRequest;
 use App\Services\CartService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\View\View;
 
 class CartController extends Controller
 {
     public function __construct(private CartService $cartService) {}
 
-    public function show(Request $request)
+    public function show(Request $request): View
     {
         $data = $this->cartService->getItems($request);
 

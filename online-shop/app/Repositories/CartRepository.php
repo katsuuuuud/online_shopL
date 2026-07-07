@@ -4,6 +4,7 @@ namespace App\Repositories;
 use App\Contracts\CartRepositoryInterface;
 use App\Models\Cart;
 use App\Models\CartItem;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Redis;
 
 class CartRepository implements CartRepositoryInterface
@@ -43,7 +44,7 @@ class CartRepository implements CartRepositoryInterface
                     'currency'   => $currency,
                 ]],
                 ['cart_id', 'product_id'],
-                ['quantity' => \Illuminate\Support\Facades\DB::raw("quantity + $quantity")]
+                ['quantity' => DB::raw('quantity + ?', [$quantity])]
             );
 
             return $this->getItemsByCartId($cartId);
@@ -95,22 +96,16 @@ class CartRepository implements CartRepositoryInterface
 
         $guestItems = $this->getGuestItems($guestId);
 
-        if ($guestItems) {
-            $cartId = $this->ensureCartForUser($userId);
-
-            foreach ($guestItems as $item) {
-                CartItem::upsert(
-                    [[
-                        'cart_id'    => $cartId,
-                        'product_id' => $item['productId'],
-                        'quantity'   => $item['quantity'],
-                        'price'      => $item['price'],
-                        'currency'   => $item['currency'],
-                    ]],
-                    ['cart_id', 'product_id'],
-                    ['quantity' => \Illuminate\Support\Facades\DB::raw("quantity + {$item['quantity']}")]
-                );
-            }
+        foreach ($guestItems as $item) {
+            $this->addItem(
+                $userId,
+                null,
+                $item['productId'],
+                $item['name'],
+                $item['price'],
+                $item['currency'],
+                $item['quantity'],
+            );
         }
 
         Redis::del(self::GUEST_KEY_PREFIX . $guestId);
