@@ -6,6 +6,8 @@ use App\Contracts\CartRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
 use App\Contracts\ProductAuditRepositoryInterface;
 use App\Exceptions\DomainException;
+use App\Helpers\Helper;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -25,6 +27,20 @@ class CreateOrderAction
         if (empty($cartItems)) {
             throw new DomainException('Корзина пуста.');
         }
+        $products = Product::with('discount')
+            ->whereIn('productId', array_column($cartItems, 'productId'))
+            ->get()
+            ->keyBy('productId');
+
+        $cartItems = array_map(function ($item) use ($products) {
+            $product = $products->get($item['productId'] ?? null);
+
+            if ($product) {
+                $item['price'] = Helper::applyDiscount($product, (float) ($item['price'] ?? 0));
+            }
+
+            return $item;
+        }, $cartItems);
 
         $address     = $user->address ?? '';
         $totalAmount = array_sum(
