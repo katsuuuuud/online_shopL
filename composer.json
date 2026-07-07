@@ -1,0 +1,5 @@
+{
+    "require-dev": {
+        "way/generators": "^3.0"
+    }
+}
