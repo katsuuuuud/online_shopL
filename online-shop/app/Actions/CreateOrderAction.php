@@ -1,11 +1,13 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Actions;
 
 use App\Contracts\CartRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
 use App\Contracts\ProductAuditRepositoryInterface;
 use App\Exceptions\DomainException;
+use App\Helpers\Helper;
+use App\Models\Product;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
@@ -25,6 +27,20 @@ class CreateOrderAction
         if (empty($cartItems)) {
             throw new DomainException('Корзина пуста.');
         }
+        $products = Product::with('discount')
+            ->whereIn('productId', array_column($cartItems, 'productId'))
+            ->get()
+            ->keyBy('productId');
+
+        $cartItems = array_map(function ($item) use ($products) {
+            $product = $products->get($item['productId'] ?? null);
+
+            if ($product) {
+                $item['price'] = Helper::applyDiscount($product, (float) ($item['price'] ?? 0));
+            }
+
+            return $item;
+        }, $cartItems);
 
         $address     = $user->address ?? '';
         $totalAmount = array_sum(
@@ -49,7 +65,7 @@ class CreateOrderAction
                 }
             }
 
-            $orderId = $this->orderRepository->saveOrder($userId, (int) round($totalAmount), $address);
+            $orderId = $this->orderRepository->saveOrder($userId, $totalAmount, $address);
             $this->orderRepository->saveOrderItems($orderId, $userId, $cartItems);
             $this->cartRepository->clear($userId, $guestId);
 
@@ -59,7 +75,8 @@ class CreateOrderAction
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            throw new DomainException('Не удалось оформить заказ: ' . $e->getMessage());
+            report($e);
+            throw new DomainException('Не удалось оформить заказ.', previous: $e);
         }
     }
 }

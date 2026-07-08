@@ -18,7 +18,10 @@
     @auth
         <a class="btn" href="{{ url('cart') }}">Корзина</a>
         <a class="btn" href="{{ url('profile') }}">Кабинет</a>
-        <a class="btn" href="{{ url('auth/logout') }}">Выйти</a>
+        <form action="{{ route('auth.logout') }}" method="POST" style="display:inline">
+            @csrf
+            <button type="submit" class="btn">Выйти</button>
+        </form>
     @else
         <a class="btn" href="{{ url('cart') }}">Корзина</a>
         <a class="btn" href="{{ url('auth/login') }}">Войти</a>

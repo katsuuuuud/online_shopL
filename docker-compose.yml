@@ -5,10 +5,10 @@ services:
     container_name: shop_mysql-l
     restart: always
     environment:
-      MYSQL_ROOT_PASSWORD: 123456
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD}
       MYSQL_DATABASE: online_shop
       MYSQL_USER: shop_user
-      MYSQL_PASSWORD: 123456
+      MYSQL_PASSWORD: ${DB_PASSWORD}
     ports:
       - "3307:3306"
     volumes:

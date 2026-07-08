@@ -34,17 +34,21 @@ class CartRepository implements CartRepositoryInterface
         if ($userId) {
             $cartId = $this->ensureCartForUser($userId);
 
-            CartItem::upsert(
-                [[
+            $existing = CartItem::where('cart_id', $cartId)
+                ->where('product_id', $productId)
+                ->first();
+
+            if ($existing) {
+                $existing->increment('quantity', $quantity);
+            } else {
+                CartItem::create([
                     'cart_id'    => $cartId,
                     'product_id' => $productId,
                     'quantity'   => $quantity,
                     'price'      => $price,
                     'currency'   => $currency,
-                ]],
-                ['cart_id', 'product_id'],
-                ['quantity' => \Illuminate\Support\Facades\DB::raw("quantity + $quantity")]
-            );
+                ]);
+            }
 
             return $this->getItemsByCartId($cartId);
         }
@@ -95,22 +99,16 @@ class CartRepository implements CartRepositoryInterface
 
         $guestItems = $this->getGuestItems($guestId);
 
-        if ($guestItems) {
-            $cartId = $this->ensureCartForUser($userId);
-
-            foreach ($guestItems as $item) {
-                CartItem::upsert(
-                    [[
-                        'cart_id'    => $cartId,
-                        'product_id' => $item['productId'],
-                        'quantity'   => $item['quantity'],
-                        'price'      => $item['price'],
-                        'currency'   => $item['currency'],
-                    ]],
-                    ['cart_id', 'product_id'],
-                    ['quantity' => \Illuminate\Support\Facades\DB::raw("quantity + {$item['quantity']}")]
-                );
-            }
+        foreach ($guestItems as $item) {
+            $this->addItem(
+                $userId,
+                null,
+                $item['productId'],
+                $item['name'],
+                $item['price'],
+                $item['currency'],
+                $item['quantity'],
+            );
         }
 
         Redis::del(self::GUEST_KEY_PREFIX . $guestId);
