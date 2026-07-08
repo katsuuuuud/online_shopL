@@ -48,3 +48,5 @@ Thumbs.db
 *.ntvs*
 *.njsproj
 *.sln
+
+/vendor
