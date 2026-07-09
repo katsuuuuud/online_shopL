@@ -76,7 +76,7 @@ class CreateOrderAction
         } catch (\Throwable $e) {
             DB::rollBack();
             report($e);
-            throw new DomainException('Не удалось оформить заказ.', previous: $e);
+            throw new DomainException('Не удалось оформить заказ.');
         }
     }
 }
