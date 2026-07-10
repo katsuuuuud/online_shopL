@@ -3,7 +3,7 @@ FROM php:8.3-cli
 RUN apt-get update && apt-get install -y libmcrypt-dev mariadb-client \
     && docker-php-ext-install pdo_mysql pcntl
 
-
+RUN pecl install redis && docker-php-ext-enable redis
 
 RUN docker-php-ext-configure exif
 RUN docker-php-ext-install exif

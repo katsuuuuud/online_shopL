@@ -37,7 +37,7 @@ function showToast(message, type = 'success') {
 }
 function updateCartDOM(items, total) {
     const list    = document.querySelector('.cart-list');
-    const summary = document.querySelector('.cart-summary');
+    const summary = document.querySelector('.cart-total');
 
     if (!list) return;
 
@@ -57,7 +57,8 @@ function updateCartDOM(items, total) {
     `).join('');
 
     if (summary) {
-        summary.textContent = `Итого: ${total.toFixed(2)}`;
+        const currency = items[0]?.currency ?? 'USD';
+        summary.textContent = `Итого: ${total.toFixed(2)} ${currency}`;
     }
 
     bindRemoveButtons();

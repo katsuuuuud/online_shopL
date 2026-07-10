@@ -10,6 +10,7 @@ use Tests\TestCase;
 
 class AuthTest extends TestCase
 {
+    use RefreshDatabase;
     public function test_login_page_opens(): void
     {
         $response = $this->get('/auth/login');

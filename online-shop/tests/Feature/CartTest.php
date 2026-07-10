@@ -13,6 +13,7 @@ use Tests\TestCase;
 
 class CartTest extends TestCase
 {
+    use RefreshDatabase;
     private function createProductWithPrice(float $price = 100.0, string $currency = 'USD'): Product
     {
         $category = Category::create([
@@ -46,13 +47,13 @@ class CartTest extends TestCase
         $user = User::factory()->create();
         $product = $this->createProductWithPrice(price: 150.0);
 
-        $responce = $this->actingAs($user)->postJson('/cart', [
+        $response = $this->actingAs($user)->postJson('/api/cart', [
             'productId' => $product->productId,
             'quantity' => 2,
         ]);
 
-        $responce->assertStatus(201);
-        $responce->assertJsonPath('total', 300.0);
+        $response->assertStatus(201);
+        $response->assertJsonPath('total', 300);
 
         $this->assertDatabaseHas('cart_items', [
             'product_id' => $product->productId,
@@ -64,7 +65,7 @@ class CartTest extends TestCase
     {
         $user = User::factory()->create();
 
-        $response = $this->actingAs($user)->postJson('/cart', [
+        $response = $this->actingAs($user)->postJson('/api/cart', [
             'productId' => 999999,
             'quantity'  => 1,
         ]);
@@ -77,15 +78,15 @@ class CartTest extends TestCase
         $user = User::factory()->create();
         $product = $this->createProductWithPrice();
 
-        $this->actingAs($user)->postJson('/cart', [
+        $this->actingAs($user)->postJson('/api/cart', [
             'productId' => $product->productId,
             'quantity'  => 1,
         ]);
 
-        $response = $this->actingAs($user)->deleteJson("/cart/{$product->productId}");
+        $response = $this->actingAs($user)->deleteJson("/api/cart/{$product->productId}");
 
         $response->assertStatus(200);
-        $response->assertJsonPath('total', 0.0);
+        $response->assertJsonPath('total', 0);
 
         $this->assertDatabaseMissing('cart_items', [
             'product_id' => $product->productId,
@@ -98,16 +99,16 @@ class CartTest extends TestCase
         $productA = $this->createProductWithPrice();
         $productB = $this->createProductWithPrice();
 
-        $this->actingAs($user)->postJson('/cart', [
+        $this->actingAs($user)->postJson('/api/cart', [
             'productId' => $productA->productId,
             'quantity' => 1
         ]);
-        $this->actingAs($user)->postJson('/cart', [
+        $this->actingAs($user)->postJson('/api/cart', [
             'productId' => $productB->productId,
             'quantity' => 1
         ]);
 
-        $response = $this->actingAs($user)->deleteJson('/cart');
+        $response = $this->actingAs($user)->deleteJson('/api/cart');
 
         $response->assertStatus(200);
         $response->assertJson(['data' => [], 'total' => 0]);
@@ -122,13 +123,13 @@ class CartTest extends TestCase
         Redis::shouldReceive('get')->andReturn(null);
         Redis::shouldReceive('setex')->andReturnTrue();
 
-        $response = $this->postJson('/cart', [
+        $response = $this->postJson('/api/cart', [
             'productId' => $product->productId,
             'quantity'  => 1,
         ]);
 
         $response->assertStatus(201);
-        $response->assertJsonPath('total', 50.0);
+        $response->assertJsonPath('total', 50);
 
         $response->assertCookie('guest_cart_id');
     }
