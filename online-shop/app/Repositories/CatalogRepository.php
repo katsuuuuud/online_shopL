@@ -36,4 +36,12 @@ class CatalogRepository implements CatalogRepositoryInterface
             ->where('is_active', 1)
             ->first();
     }
+
+    public function getActivePrices(array $productIds): Collection
+    {
+        return Price::whereIn('product_id', $productIds)
+            ->where('is_active', 1)
+            ->get()
+            ->keyBy('product_id');
+    }
 }

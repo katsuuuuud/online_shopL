@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 
 class OrderRepository implements OrderRepositoryInterface
 {
-    public function saveOrder(int $customerId, int $amount, string $address): int
+    public function saveOrder(int $customerId, float $amount, string $address): int
     {
         $order = Order::create([
             'created_at'  => now()->toDateString(),

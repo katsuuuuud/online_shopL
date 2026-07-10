@@ -51,7 +51,7 @@ function updateCartDOM(items, total) {
     list.innerHTML = items.map(item => `
         <li class="cart-item" data-id="${item.productId}">
             <span>${item.name} — ${item.quantity} шт.</span>
-            <button type="button" class="btn-cart remove-from-cart"
+            <button type="button" class="btn remove-from-cart"
                     data-product-id="${item.productId}">Удалить</button>
         </li>
     `).join('');
@@ -162,7 +162,7 @@ async function onProfileUpdate(event) {
     submitBtn.disabled = true;
 
     try {
-        await api.patch('/api/profile', body);
+        await api.patch(form.dataset.url, body);
         showToast('Профиль успешно обновлён');
     } catch (e) {
         showToast(e.message, 'error');

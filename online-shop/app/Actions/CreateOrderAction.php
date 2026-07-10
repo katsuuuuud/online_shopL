@@ -1,26 +1,46 @@
 <?php
-
-namespace App\Services;
+declare(strict_types=1);
+namespace App\Actions;
 
 use App\Contracts\CartRepositoryInterface;
 use App\Contracts\OrderRepositoryInterface;
+use App\Contracts\ProductAuditRepositoryInterface;
+use App\Exceptions\DomainException;
+use App\Helpers\Helper;
+use App\Models\Product;
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 
-class OrderService
+class CreateOrderAction
 {
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
-        private CartRepositoryInterface  $cartRepository,
+        private CartRepositoryInterface $cartRepository,
+        private ProductAuditRepositoryInterface $productAuditRepository,
     ) {}
 
-    public function createOrder(object $user, ?string $guestId): array
+    public function execute(User $user, ?string $guestId): int
     {
         $userId    = $user->userId;
         $cartItems = $this->cartRepository->getItems($userId, $guestId);
 
         if (empty($cartItems)) {
-            return ['success' => false, 'message' => 'Корзина пуста.'];
+            throw new DomainException('Корзина пуста.');
         }
+        $products = Product::with('discount')
+            ->whereIn('productId', array_column($cartItems, 'productId'))
+            ->get()
+            ->keyBy('productId');
+
+        $cartItems = array_map(function ($item) use ($products) {
+            $product = $products->get($item['productId'] ?? null);
+
+            if ($product) {
+                $item['price'] = Helper::applyDiscount($product, (float) ($item['price'] ?? 0));
+            }
+
+            return $item;
+        }, $cartItems);
 
         $address     = $user->address ?? '';
         $totalAmount = array_sum(
@@ -38,30 +58,25 @@ class OrderService
                     throw new \RuntimeException('Некорректные данные товара в корзине.');
                 }
 
-                $updated = DB::update(
-                    'UPDATE product_audit SET quantity = quantity - ?
-                     WHERE product_id = ? AND quantity >= ?',
-                    [$quantity, $productId, $quantity]
-                );
-
-                if ($updated === 0) {
+                if (! $this->productAuditRepository->decrementStock($productId, $quantity)) {
                     throw new \RuntimeException(
                         'Извините, товар "' . ($item['name'] ?? 'товар') . '" закончился'
                     );
                 }
             }
 
-            $orderId = $this->orderRepository->saveOrder($userId, (int) round($totalAmount), $address);
+            $orderId = $this->orderRepository->saveOrder($userId, $totalAmount, $address);
             $this->orderRepository->saveOrderItems($orderId, $userId, $cartItems);
             $this->cartRepository->clear($userId, $guestId);
 
             DB::commit();
 
-            return ['success' => true, 'message' => 'Заказ успешно оформлен.', 'orderId' => $orderId];
+            return $orderId;
 
         } catch (\Throwable $e) {
             DB::rollBack();
-            return ['success' => false, 'message' => 'Не удалось оформить заказ: ' . $e->getMessage()];
+            report($e);
+            throw new DomainException('Не удалось оформить заказ.');
         }
     }
 }

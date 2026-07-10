@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Contracts\CartRepositoryInterface;
+use App\Exceptions\DomainException;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -13,63 +14,84 @@ class AuthService
         private CartRepositoryInterface $cartRepository
     ) {}
 
-    public function login(array $data, ?string $guestId): array
+    public function login(LoginDTO $dto, ?string $guestId): User
     {
-        $email    = trim((string) ($data['email']    ?? ''));
-        $password = trim((string) ($data['password'] ?? ''));
-        $next     = trim((string) ($data['next']     ?? '/'));
+        $user = User::where('email', $dto->email)->first();
 
-        if ($email === '' || $password === '') {
-            return ['success' => false, 'message' => 'Введите email и пароль.', 'next' => $next];
-        }
-
-        $user = User::where('email', $email)->first();
-
-        if (! $user || ! Hash::check($password, $user->password)) {
-            return ['success' => false, 'message' => 'Неверный email или пароль.', 'next' => $next];
+        if (! $user || ! Hash::check($dto->password, $user->password)) {
+            throw new DomainException('Неверный email или пароль.', 401);
         }
 
         Auth::login($user);
 
         $this->cartRepository->mergeGuestCartToUser($user->userId, $guestId);
 
-        return ['success' => true, 'message' => 'Вы успешно вошли.', 'next' => $next, 'user' => $user];
+        return $user;
     }
 
-    public function register(array $data, ?string $guestId): array
+    public function register(RegisterDTO $dto, ?string $guestId): User
     {
-        $name     = trim((string) ($data['name']     ?? ''));
-        $email    = trim((string) ($data['email']    ?? ''));
-        $phone    = trim((string) ($data['phone']    ?? ''));
-        $address  = trim((string) ($data['address']  ?? ''));
-        $password = trim((string) ($data['password'] ?? ''));
-        $next     = trim((string) ($data['next']     ?? '/'));
-
-        if ($name === '' || $email === '' || $phone === '' || $address === '' || $password === '') {
-            return ['success' => false, 'message' => 'Заполните все поля для регистрации.', 'next' => $next];
-        }
-
-        if (User::where('email', $email)->exists()) {
-            return ['success' => false, 'message' => 'Пользователь с таким email уже зарегистрирован.', 'next' => $next];
+        if (User::where('email', $dto->email)->exists()) {
+            throw new DomainException('Пользователь с таким email уже зарегистрирован.', 422);
         }
 
         $user = User::create([
-            'name'     => $name,
-            'email'    => $email,
-            'phone'    => $phone,
-            'address'  => $address,
-            'password' => Hash::make($password),
+            'name'     => $dto->name,
+            'email'    => $dto->email,
+            'phone'    => $dto->phone,
+            'address'  => $dto->address,
+            'password' => Hash::make($dto->password),
         ]);
 
         Auth::login($user);
 
         $this->cartRepository->mergeGuestCartToUser($user->userId, $guestId);
 
-        return ['success' => true, 'message' => 'Регистрация прошла успешно.', 'next' => $next, 'user' => $user];
+        return $user;
     }
 
     public function logout(): void
     {
         Auth::logout();
     }
+}
+
+class LoginDTO
+{
+    public function __construct(
+        public readonly string $email,
+        public readonly string $password,
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            email: trim((string) ($data['email'] ?? '')),
+            password: trim((string) ($data['password'] ?? '')),
+        );
+    }
+
+}
+
+class RegisterDTO
+{
+    public function __construct(
+        public readonly string $name,
+        public readonly string $email,
+        public readonly string $phone,
+        public readonly string $address,
+        public readonly string $password,
+    ) {}
+
+    public static function fromArray(array $data): self
+    {
+        return new self(
+            name: trim((string) ($data['name'] ?? '')),
+            email: trim((string) ($data['email'] ?? '')),
+            phone: trim((string) ($data['phone'] ?? '')),
+            address: trim((string) ($data['address'] ?? '')),
+            password: trim((string) ($data['password'] ?? '')),
+        );
+    }
+
 }

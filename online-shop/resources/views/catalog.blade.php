@@ -15,7 +15,7 @@
                 </li>
                 @foreach($categories as $cat)
                     <li>
-                        <a href="/?category={{ $cat['categoryId'] ?? $cat->categoryId }}"
+                        <a href="/category/{{ $cat['categoryId'] ?? $cat->categoryId }}"
                            class="{{ $activeCategoryId === ($cat['categoryId'] ?? $cat->categoryId) ? 'active' : '' }}">
                             <span class="cat-dot"></span>
                             {{ $cat['name'] ?? $cat->name }}
@@ -37,9 +37,10 @@
                         $productId   = $product['productId']   ?? $product->productId;
                         $name        = $product['name'];
                         $categoryName= $product['category_name'] ?? '—';
-                        $hasDiscount = $product['has_discount'] ?? false;
-                        $price       = $product['price']       ?? null;
-                        $currency    = $product['currency']    ?? null;
+                        $hasDiscount   = $product['has_discount'] ?? false;
+                        $price         = $product['price']       ?? null;
+                        $originalPrice = $product['original_price'] ?? null;
+                        $currency      = $product['currency']    ?? null;
                     @endphp
                     <div class="card">
                         @if($hasDiscount)
@@ -56,12 +57,15 @@
                         <div class="card-footer">
                         <span class="price">
                             @if($price)
+                                @if($hasDiscount && $originalPrice)
+                                    <span class="price-old">{{ number_format($originalPrice, 2) }} {{ $currency }}</span>
+                                @endif
                                 {{ number_format($price, 2) }} {{ $currency }}
                             @else
                                 —
                             @endif
                         </span>
-                            <button type="button" class="btn-cart add-to-cart"
+                            <button type="button" class="btn add-to-cart"
                                     data-product-id="{{ $productId }}">+</button>
                         </div>
                     </div>

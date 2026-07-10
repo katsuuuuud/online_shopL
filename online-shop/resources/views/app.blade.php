@@ -16,12 +16,15 @@
     <span class="header-meta">@yield('header-meta', 'КАТАЛОГ')</span>
 
     @auth
-        <a class="btn-cart" href="{{ url('cart') }}">Корзина</a>
-        <a class="btn-cart" href="{{ url('profile') }}">Кабинет</a>
-        <a class="btn-cart" href="{{ url('auth/logout') }}">Выйти</a>
+        <a class="btn" href="{{ url('cart') }}">Корзина</a>
+        <a class="btn" href="{{ url('profile') }}">Кабинет</a>
+        <form action="{{ route('auth.logout') }}" method="POST" style="display:inline">
+            @csrf
+            <button type="submit" class="btn">Выйти</button>
+        </form>
     @else
-        <a class="btn-cart" href="{{ url('cart') }}">Корзина</a>
-        <a class="btn-cart" href="{{ url('auth/login') }}">Войти</a>
+        <a class="btn" href="{{ url('cart') }}">Корзина</a>
+        <a class="btn" href="{{ url('auth/login') }}">Войти</a>
     @endauth
 </header>
 

@@ -1,75 +1,62 @@
 <?php
-
+declare(strict_types=1);
 namespace App\Http\Controllers;
 
+use App\Http\Requests\LoginRequest;
+use App\Http\Requests\RegisterRequest;
 use App\Services\AuthService;
+use App\Services\LoginDTO;
+use App\Services\RegisterDTO;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\View\View;
 
 class AuthController extends Controller
 {
     public function __construct(private AuthService $authService) {}
 
-
-    public function showLogin(Request $request)
+    public function handleLogin(LoginRequest $request): RedirectResponse
     {
-        if (Auth::check()) {
-            return redirect('/');
-        }
+        $guestId = $request->cookie('guest_cart_id');
+        $next    = (string) $request->query('next', '/');
 
+        $this->authService->login(LoginDTO::fromArray($request->validated()), $guestId);
+
+        return redirect($next);
+    }
+
+    public function handleRegister(RegisterRequest $request): RedirectResponse
+    {
+        $guestId = $request->cookie('guest_cart_id');
+        $next    = (string) $request->query('next', '/');
+
+        $this->authService->register(RegisterDTO::fromArray($request->validated()), $guestId);
+
+        return redirect($next);
+    }
+
+
+    public function showLogin(Request $request): View
+    {
         $mode  = 'login';
-        $next  = $request->query('next', '/');
-        $error = $request->query('error', '');
+        $next  = (string) $request->query('next', '/');
+        $error = (string) $request->query('error', '');
 
-        return view('form', compact('mode', 'next', 'error'));
+        return view('auth', compact('mode', 'next', 'error'));
     }
 
-    public function showRegister(Request $request)
+    public function showRegister(Request $request): View
     {
-        if (Auth::check()) {
-            return redirect('/');
-        }
-
         $mode  = 'register';
-        $next  = $request->query('next', '/');
-        $error = $request->query('error', '');
+        $next  = (string) $request->query('next', '/');
+        $error = (string) $request->query('error', '');
 
-        return view('form', compact('mode', 'next', 'error'));
+        return view('auth', compact('mode', 'next', 'error'));
     }
 
-    public function handleLogin(Request $request)
-    {
-        $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->login($request->all(), $guestId);
-        $next    = $result['next'] ?? '/';
-
-        if ($result['success']) {
-            return redirect($next);
-        }
-
-        return redirect('/auth/login?' . http_build_query([
-                'next'  => $next,
-                'error' => $result['message'],
-            ]));
-    }
-
-    public function handleRegister(Request $request)
-    {
-        $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->register($request->all(), $guestId);
-        $next    = $result['next'] ?? '/';
-
-        if ($result['success']) {
-            return redirect($next);
-        }
-
-        return redirect('/auth/register?' . http_build_query([
-                'next'  => $next,
-                'error' => $result['message'],
-            ]));
-    }
-
-    public function logout(Request $request)
+    public function logout(Request $request): RedirectResponse
     {
         $this->authService->logout();
         $request->session()->invalidate();
@@ -80,36 +67,19 @@ class AuthController extends Controller
     }
 
 
-    public function apiLogin(Request $request)
+    public function apiLogin(LoginRequest $request): JsonResponse
     {
         $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->login($request->all(), $guestId);
-
-        if (! $result['success']) {
-            return response()->json(['error' => $result['message']], 401);
-        }
+        $this->authService->login(LoginDTO::fromArray($request->validated()), $guestId);
 
         return response()->json(['data' => Auth::user()]);
     }
 
-    public function apiRegister(Request $request)
+    public function apiRegister(RegisterRequest $request): JsonResponse
     {
         $guestId = $request->cookie('guest_cart_id');
-        $result  = $this->authService->register($request->all(), $guestId);
-
-        if (! $result['success']) {
-            return response()->json(['error' => $result['message']], 422);
-        }
+        $this->authService->register(RegisterDTO::fromArray($request->validated()), $guestId);
 
         return response()->json(['data' => Auth::user()], 201);
-    }
-
-    public function apiLogout(Request $request)
-    {
-        $this->authService->logout();
-        $request->session()->invalidate();
-
-        return response()->json(['data' => null])
-            ->withCookie(cookie()->forget('guest_cart_id'));
     }
 }

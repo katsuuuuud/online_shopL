@@ -20,18 +20,22 @@
                         @foreach($items as $item)
                             <li class="cart-item">
                                 <span>{{ $item['name'] }} — {{ (int)$item['quantity'] }} шт.</span>
-                                <button type="button" class="btn-cart remove-from-cart"
+                                <button type="button" class="btn remove-from-cart"
                                         data-product-id="{{ (int)$item['productId'] }}">Удалить</button>
                             </li>
                         @endforeach
                     </ul>
 
+                    <div class="cart-total">
+                        Итого: {{ number_format($total, 2) }} {{ $items[0]['currency'] ?? 'USD' }}
+                    </div>
+
                     <div class="cart-actions">
-                        <button type="button" class="btn-cart clear-cart">Очистить корзину</button>
+                        <button type="button" class="btn clear-cart">Очистить корзину</button>
                         @auth
-                            <button type="button" class="btn-cart make-order">Оформить заказ</button>
+                            <button type="button" class="btn make-order">Оформить заказ</button>
                         @else
-                            <a class="btn-cart" href="/auth/login?next=/cart">Войти для оформления</a>
+                            <a class="btn" href="/auth/login?next=/cart">Войти для оформления</a>
                         @endauth
                     </div>
                 </div>
@@ -42,7 +46,7 @@
                             <h2>Оформление заказа</h2>
                             <form id="order-form">
                                 @csrf
-                                <button type="submit" class="btn-cart">Подтвердить заказ</button>
+                                <button type="submit" class="btn">Подтвердить заказ</button>
                             </form>
                         </div>
                     </div>
