@@ -53,7 +53,7 @@ class OrderTest extends TestCase
             'orderId'     => $orderId,
             'customer_id' => $user->userId,
             'amount'      => 200,
-            'status'      => 'new',
+            'status'      => 'pending payment',
             'address'     => $user->address,
         ]);
 
@@ -94,7 +94,6 @@ class OrderTest extends TestCase
 
         $response->assertStatus(422);
 
-        // транзакция должна откатиться — новых заказов и списаний быть не должно
         $this->assertDatabaseCount('orders', 0);
         $this->assertDatabaseCount('order_items', 0);
         $this->assertDatabaseHas('product_audit', [
@@ -102,7 +101,6 @@ class OrderTest extends TestCase
             'quantity'   => 1,
         ]);
 
-        // корзина не должна очищаться, если заказ не создан
         $this->assertDatabaseCount('cart_items', 1);
     }
 
@@ -146,7 +144,6 @@ class OrderTest extends TestCase
 
         $orderId = $response->json('data.orderId');
 
-        // 2*50 + 3*30 = 190
         $this->assertDatabaseHas('orders', [
             'orderId' => $orderId,
             'amount'  => 190,
@@ -219,7 +216,6 @@ class OrderTest extends TestCase
 
         $orderId = $response->json('data.orderId');
 
-        // скидка неактивна — цена не должна измениться
         $this->assertDatabaseHas('orders', [
             'orderId' => $orderId,
             'amount'  => 100,

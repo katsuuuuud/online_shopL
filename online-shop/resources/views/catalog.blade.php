@@ -41,10 +41,14 @@
                         $price         = $product['price']       ?? null;
                         $originalPrice = $product['original_price'] ?? null;
                         $currency      = $product['currency']    ?? null;
+                        $inStock       = $product['in_stock']    ?? true;
                     @endphp
                     <div class="card">
                         @if($hasDiscount)
                             <span class="tag tag-sale">SALE</span>
+                        @endif
+                        @if(!$inStock)
+                            <span class="tag tag-out-of-stock">нет на складе</span>
                         @endif
 
                         <div class="card-img"></div>
@@ -65,8 +69,10 @@
                                 —
                             @endif
                         </span>
-                            <button type="button" class="btn add-to-cart"
-                                    data-product-id="{{ $productId }}">+</button>
+                            @if($inStock)
+                                <button type="button" class="btn add-to-cart"
+                                        data-product-id="{{ $productId }}">+</button>
+                            @endif
                         </div>
                     </div>
                 @endforeach

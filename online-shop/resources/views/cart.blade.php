@@ -55,3 +55,7 @@
         </main>
     </div>
 @endsection
+
+@section('scripts')
+    <script src="{{ config('epay.payform_js_url') }}"></script>
+@endsection

@@ -24,11 +24,15 @@ class CatalogService
         $productIds = $products->pluck('productId')->all();
 
         $prices = $this->repo->getActivePrices($productIds);
+        $stockQuantities = $this->repo->getStockQuantities($productIds);
 
-        $products = $products->map(function ($product) use ($categoryMap, $prices) {
+        $products = $products->map(function ($product) use ($categoryMap, $prices, $stockQuantities) {
             $priceRow  = $prices->get($product->productId);
             $basePrice = $priceRow ? (float) $priceRow->price : null;
             $discountInfo = Helper::priceInfo($product, $basePrice);
+
+            $quantity = $stockQuantities->get($product->productId)?->quantity ?? 0;
+            $inStock  = $quantity > 0;
 
             return array_merge($product->toArray(), [
                 'price'          => $discountInfo['price'],
@@ -36,6 +40,8 @@ class CatalogService
                 'has_discount'   => $discountInfo['has_discount'],
                 'currency'       => $priceRow?->currency,
                 'category_name'  => $categoryMap[$product->category_id] ?? '—',
+                'quantity'       => $quantity,
+                'in_stock'       => $inStock,
             ]);
         });
 

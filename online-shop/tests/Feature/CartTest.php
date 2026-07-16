@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Price;
 use App\Models\Product;
+use App\Models\ProductAudit;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -14,7 +15,7 @@ use Tests\TestCase;
 class CartTest extends TestCase
 {
     use RefreshDatabase;
-    private function createProductWithPrice(float $price = 100.0, string $currency = 'USD'): Product
+    private function createProductWithPrice(float $price = 100.0, string $currency = 'USD', int $stock = 10): Product
     {
         $category = Category::create([
             'name'        => 'Тестовая категория',
@@ -33,6 +34,11 @@ class CartTest extends TestCase
             'price'      => $price,
             'currency'   => $currency,
             'is_active'  => true,
+        ]);
+
+        ProductAudit::create([
+            'product_id' => $product->productId,
+            'quantity'   => $stock,
         ]);
 
         return $product;

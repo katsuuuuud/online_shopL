@@ -35,6 +35,17 @@ class CartService
             throw new DomainException('Товар не найден', 404);
         }
 
+        $stock = $this->catalogRepo->getStockQuantities([$productId])->get($productId);
+        $available = $stock?->quantity ?? 0;
+
+        if ($available <= 0) {
+            throw new DomainException('Товара нет на складе', 422);
+        }
+
+        if ($quantity > $available) {
+            throw new DomainException('Недостаточно товара на складе', 422);
+        }
+
         $priceData = $this->catalogRepo->getActivePrice($productId);
         $price     = $priceData ? (float) $priceData->price : 0.0;
         $currency  = $priceData ? $priceData->currency       : 'USD';
