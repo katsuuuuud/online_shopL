@@ -143,15 +143,52 @@ async function onSubmitOrderForm(event) {
 
     try {
         const { data } = await api.post('/api/orders', {});
-        showToast(`Заказ успешно оформлен!`);
+        const orderId = data.orderId;
+
+        showToast('Заказ оформлен, переходим к оплате…');
         document.querySelector('.order-form-modal').style.display = 'none';
 
         updateCartDOM([], 0);
         updateCartCount(0);
+
+        await startPayment(orderId);
     } catch (e) {
         showToast(e.message, 'error');
         submitBtn.disabled = false;
     }
+}
+
+async function startPayment(orderId) {
+    if (typeof halyk === 'undefined') {
+        showToast('Платёжная форма не загрузилась, обновите страницу', 'error');
+        return;
+    }
+
+    let payment;
+    try {
+        payment = await api.get(`/api/orders/${orderId}/payment-token`);
+    } catch (e) {
+        showToast('Не удалось начать оплату: ' + e.message, 'error');
+        return;
+    }
+
+    const { auth, invoiceId, amount, terminal, backLink, failureBackLink, postLink, failurePostLink } = payment.data;
+
+    // Шаг 5: открываем платёжную форму банка
+    halyk.pay({
+        invoiceId: String(invoiceId),
+        backLink,
+        failureBackLink,
+        autoBackLink: true,
+        postLink,
+        failurePostLink,
+        language: 'rus',
+        description: `Оплата заказа №${invoiceId}`,
+        terminal,
+        amount,
+        currency: 'KZT',
+        auth,
+    });
 }
 
 async function onProfileUpdate(event) {
@@ -195,6 +232,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('order-form')
         ?.addEventListener('submit', onSubmitOrderForm);
+
+    document.querySelectorAll('.pay-order').forEach(btn => {
+        btn.addEventListener('click', () => {
+            btn.disabled = true;
+            startPayment(+btn.dataset.orderId).finally(() => { btn.disabled = false; });
+        });
+    });
 
     document.querySelectorAll('.auth-form').forEach(form => {
         form.addEventListener('submit', onAuthSubmit);

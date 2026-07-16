@@ -31,12 +31,26 @@
                     @else
                         <ul class="orders-list">
                             @foreach($orders as $order)
+                                @php
+                                    $statusLabels = [
+                                        'pending payment' => 'Ожидает оплаты',
+                                        'failed'  => 'Оплата не прошла',
+                                        'paid'    => 'Оплачен',
+                                    ];
+                                    $statusLabel = $statusLabels[$order->status] ?? $order->status;
+                                @endphp
                                 <li class="order-card">
                                     <div><strong>Заказ #</strong>{{ $order->orderId }}</div>
                                     <div><strong>Дата:</strong> {{ $order->created_at -> format('d.m.Y')}}</div>
                                     <div><strong>Сумма:</strong> {{ number_format($order->amount, 2) }}</div>
-                                    <div><strong>Статус:</strong> {{ $order->status }}</div>
+                                    <div><strong>Статус:</strong> <span class="order-status order-status--{{ $order->status }}">{{ $statusLabel }}</span></div>
                                     <div><strong>Адрес:</strong> {{ $order->address }}</div>
+
+                                    @if(in_array($order->status, ['pending payment', 'failed']))
+                                        <button type="button" class="btn pay-order" data-order-id="{{ $order->orderId }}">
+                                            {{ $order->status === 'failed' ? 'Оплатить повторно' : 'Оплатить' }}
+                                        </button>
+                                    @endif
                                 </li>
                             @endforeach
                         </ul>
@@ -67,4 +81,8 @@
             </section>
         </div>
     </main>
+@endsection
+
+@section('scripts')
+    <script src="{{ config('epay.payform_js_url') }}"></script>
 @endsection

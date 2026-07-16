@@ -247,6 +247,7 @@ main { padding: 40px 0 0 40px; }
 .tag-hit  { background: var(--accent);  color: #0d0d0d; }
 .tag-new  { background: #3b82f6;        color: #fff; }
 .tag-sale { background: var(--accent2); color: #fff; }
+.tag-out-of-stock { background: #6b7280; color: #fff; }
 
 footer {
     text-align: center;

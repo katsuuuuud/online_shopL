@@ -4,6 +4,7 @@
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
 use Illuminate\Support\Facades\Route;
 
@@ -15,6 +16,9 @@ Route::middleware('web')->group(function () {
     Route::post('/auth/register', [AuthController::class, 'apiRegister']);
     Route::post('/orders', [OrderController::class, 'apiCreate'])->middleware('auth');
     Route::patch('/profile', [ProfileController::class, 'apiUpdate'])->name('profile.update')->middleware('auth');
+    Route::get('/orders/{orderId}/payment-token', [PaymentController::class, 'apiGetToken'])->middleware('auth');
+    Route::post('/epay/postlink', [PaymentController::class, 'apiPostLink']);
+    Route::post('/epay/postlink/failure', [PaymentController::class, 'apiPostLinkFailure']);
 });
 
 Route::fallback(function () {

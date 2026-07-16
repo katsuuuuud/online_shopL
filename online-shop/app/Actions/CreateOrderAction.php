@@ -66,7 +66,7 @@ class CreateOrderAction
             }
 
             $orderId = $this->orderRepository->saveOrder($userId, $totalAmount, $address);
-            $this->orderRepository->saveOrderItems($orderId, $userId, $cartItems);
+            $this->orderRepository->saveOrderItems($orderId, $cartItems);
             $this->cartRepository->clear($userId, $guestId);
 
             DB::commit();
