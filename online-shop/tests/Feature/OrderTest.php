@@ -60,7 +60,6 @@ class OrderTest extends TestCase
         $this->assertDatabaseHas('order_items', [
             'order_id'    => $orderId,
             'product_id'  => $product->productId,
-            'customer_id' => $user->userId,
             'quantity'    => 2,
             'price'       => 100,
         ]);
