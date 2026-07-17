@@ -28,6 +28,8 @@ class PaymentController extends Controller
 
         $token = $this->paymentService->getPaymentToken($order->orderId, (float) $order->amount);
 
+        $this->orderRepository->setEpayInvoiceId($order->orderId, $token['invoice_id']);
+
         return response()->json([
             'data' => [
                 'auth' => [

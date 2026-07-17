@@ -4,6 +4,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CatalogController;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
@@ -21,3 +22,16 @@ Route:: get('/profile', [ProfileController::class, 'show'])->name('profile.show'
 Route::get('/', [CatalogController::class, 'showProducts'])->name('catalog.index');
 Route::get('/category/{categoryId}', [CatalogController::class, 'showProductsByCategory'])
     ->name('catalog.category');
+Route::get('/debug', function (Request $request) {
+    return response()->json([
+        'secure' => $request->isSecure(),
+        'scheme' => $request->getScheme(),
+        'asset' => asset('css/style.css'),
+        'url' => url('/'),
+        'app_url' => config('app.url'),
+        'headers' => [
+            'x-forwarded-proto' => $request->header('x-forwarded-proto'),
+            'host' => $request->header('host'),
+        ],
+    ]);
+});

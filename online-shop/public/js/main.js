@@ -174,7 +174,6 @@ async function startPayment(orderId) {
 
     const { auth, invoiceId, amount, terminal, backLink, failureBackLink, postLink, failurePostLink } = payment.data;
 
-    // Шаг 5: открываем платёжную форму банка
     halyk.pay({
         invoiceId: String(invoiceId),
         backLink,
