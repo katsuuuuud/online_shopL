@@ -54,24 +54,32 @@ class PaymentController extends Controller
 
         Log::info('Epay postLink получен', $payload);
 
-        $orderId = (int) ($payload['invoiceId'] ?? 0);
+        $invoiceId = (string) ($payload['invoiceId'] ?? '');
 
-        if ($orderId <= 0) {
+        if ($invoiceId === '') {
             return response()->json(['error' => 'invoiceId отсутствует'], ResponseAlias::HTTP_BAD_REQUEST);
         }
 
-        $expectedHash = hash_hmac('sha256', (string) $orderId, config('epay.secret_salt'));
+        $order = $this->orderRepository->findByEpayInvoiceId($invoiceId);
+
+        if (! $order) {
+            Log::warning('Epay postLink: заказ не найден по invoiceId', ['invoiceId' => $invoiceId]);
+
+            return response()->json(['error' => 'Заказ не найден'], ResponseAlias::HTTP_NOT_FOUND);
+        }
+
+        $expectedHash = hash_hmac('sha256', (string) $order->orderId, config('epay.secret_salt'));
         $receivedHash = $payload['secret_hash'] ?? '';
 
         if (! hash_equals($expectedHash, $receivedHash)) {
-            Log::warning('Epay postLink: неверный secret_hash', ['orderId' => $orderId]);
+            Log::warning('Epay postLink: неверный secret_hash', ['orderId' => $order->orderId]);
 
             return response()->json(['error' => 'Неверная подпись'], ResponseAlias::HTTP_FORBIDDEN);
         }
 
         $isSuccess = ($payload['code'] ?? null) === 'ok';
 
-        $this->orderRepository->updateStatus($orderId, $isSuccess ? 'paid' : 'failed');
+        $this->orderRepository->updateStatus($order->orderId, $isSuccess ? 'paid' : 'failed');
 
         return response()->json(['status' => 'received'], ResponseAlias::HTTP_OK);
     }
