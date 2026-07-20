@@ -5,6 +5,8 @@ namespace App\Services;
 
 use App\Contracts\OrderRepositoryInterface;
 use App\Exceptions\DomainException;
+use App\Models\Transaction;
+use App\Models\TransactionLog;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -26,6 +28,29 @@ class PaymentService
 
         $this->orderRepository->setEpayInvoiceId($order->orderId, $token['invoice_id']);
 
+        $transaction = Transaction::create([
+            'order_id'   => $order->orderId,
+            'invoice_id' => $token['invoice_id'],
+            'amount'     => $order->amount,
+            'currency'   => 'KZT',
+            'status'     => 'pending',
+        ]);
+
+        TransactionLog::create([
+            'transaction_id'  => $transaction->id,
+            'event_type'      => 'request_sent',
+            'direction'       => 'outgoing',
+            'http_status'     => $token['http_status'],
+            'request_payload' => [
+                'invoiceId' => $token['invoice_id'],
+                'amount'    => $order->amount,
+                'currency'  => 'KZT',
+                'terminal'  => config('epay.terminal_id'),
+            ],
+            'signature_valid' => null,
+            'ip_address'      => null,
+        ]);
+
         return [
             'auth' => [
                 'access_token' => $token['access_token'],
@@ -44,7 +69,7 @@ class PaymentService
         ];
     }
 
-    public function handlePostLinkCallback(array $payload): array
+    public function handlePostLinkCallback(array $payload, ?string $ip = null): array
     {
         $invoiceId = (string) ($payload['invoiceId'] ?? '');
 
@@ -57,16 +82,60 @@ class PaymentService
         }
 
         $receivedHash = (string) ($payload['secret_hash'] ?? '');
+        $signatureValid = $this->isSignatureValid($order->orderId, $receivedHash);
 
-        if (! $this->isSignatureValid($order->orderId, $receivedHash)) {
+        $transaction = Transaction::where('invoice_id', $invoiceId)->first();
+
+        if (! $signatureValid) {
             Log::warning('Epay postLink: неверный secret_hash', ['orderId' => $order->orderId]);
+
+            if ($transaction) {
+                TransactionLog::create([
+                    'transaction_id'  => $transaction->id,
+                    'event_type'      => 'webhook_received',
+                    'direction'       => 'incoming',
+                    'http_status'     => 403,
+                    'request_payload' => $payload,
+                    'signature_valid' => false,
+                    'ip_address'      => $ip,
+                ]);
+            }
 
             throw new DomainException('Неверная подпись', 403);
         }
 
         $isSuccess = ($payload['code'] ?? null) === 'ok';
+        $status    = $isSuccess ? 'paid' : 'failed';
 
-        $this->orderRepository->updateStatus($order->orderId, $isSuccess ? 'paid' : 'failed');
+        $this->orderRepository->updateStatus($order->orderId, $status);
+
+        if ($transaction) {
+            $transaction->update([
+                'epay_transaction_id' => $payload['id'] ?? null,
+                'reference'           => $payload['reference'] ?? null,
+                'approval_code'       => $payload['approvalCode'] ?? null,
+                'card_mask'           => $payload['cardMask'] ?? null,
+                'card_type'           => $payload['cardType'] ?? null,
+                'card_id'             => $payload['cardId'] ?? null,
+                'phone'               => $payload['phone'] ?? null,
+                'email'               => $payload['email'] ?? null,
+                'amount_bonus'        => $payload['amount_bonus'] ?? null,
+                'status'              => $status,
+                'paid_at'             => $isSuccess ? ($payload['dateTime'] ?? now()) : null,
+            ]);
+
+            TransactionLog::create([
+                'transaction_id'  => $transaction->id,
+                'event_type'      => 'webhook_received',
+                'direction'       => 'incoming',
+                'http_status'     => 200,
+                'request_payload' => $payload,
+                'signature_valid' => true,
+                'ip_address'      => $ip,
+            ]);
+        } else {
+            Log::warning('Epay postLink: транзакция не найдена по invoiceId', ['invoiceId' => $invoiceId]);
+        }
 
         return ['status' => 'received'];
     }
@@ -107,6 +176,7 @@ class PaymentService
             'expires_in'   => $data['expires_in'],
             'invoice_id'   => $invoiceId,
             'secret_hash'  => $secretHash,
+            'http_status'  => $response->status(),
         ];
     }
 

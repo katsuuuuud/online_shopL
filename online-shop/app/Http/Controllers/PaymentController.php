@@ -27,7 +27,7 @@ class PaymentController extends Controller
     {
         Log::info('Epay postLink получен', $request->validated());
 
-        $result = $this->paymentService->handlePostLinkCallback($request->validated());
+        $result = $this->paymentService->handlePostLinkCallback($request->validated(), $request->ip());
 
         return response()->json($result, ResponseAlias::HTTP_OK);
     }

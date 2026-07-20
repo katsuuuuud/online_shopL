@@ -10,8 +10,9 @@ return new class extends Migration
     {
         Schema::create('transactions', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('order_id')
-                ->constrained('orders')
+            $table->integer('order_id');
+            $table->foreign('order_id', 'fk_transactions_order')
+                ->references('orderId')->on('orders')
                 ->onDelete('restrict')
                 ->onUpdate('cascade');
             $table->string('invoice_id')->unique();
@@ -19,10 +20,14 @@ return new class extends Migration
             $table->string('reference')->nullable();
             $table->string('approval_code')->nullable();
             $table->decimal('amount', 12, 2);
+            $table->decimal('amount_bonus', 12, 2)->nullable();
             $table->string('currency', 3)->default('KZT');
             $table->string('status')->default('pending');
             $table->string('card_mask')->nullable();
             $table->string('card_type')->nullable();
+            $table->string('card_id')->nullable();
+            $table->string('phone')->nullable();
+            $table->string('email')->nullable();
             $table->timestamp('paid_at')->nullable();
             $table->timestamps();
         });
