@@ -3,16 +3,77 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Contracts\OrderRepositoryInterface;
 use App\Exceptions\DomainException;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Str;
 
 class PaymentService
 {
-    public function getPaymentToken(int $orderId, float $amount): array
+    public function __construct(
+        private OrderRepositoryInterface $orderRepository,
+    ) {}
+
+    public function createPaymentToken(int $orderId, int $userId): array
     {
-        $invoiceId  = $this->buildInvoiceId($orderId);
+        $order = $this->orderRepository->findOwnedByUser($orderId, $userId);
+
+        if (! $order) {
+            throw new DomainException('Заказ не найден.', 404);
+        }
+
+        $token = $this->requestPaymentToken($order->orderId, (float) $order->amount);
+
+        $this->orderRepository->setEpayInvoiceId($order->orderId, $token['invoice_id']);
+
+        return [
+            'auth' => [
+                'access_token' => $token['access_token'],
+                'expires_in'   => $token['expires_in'],
+                'scope'        => config('epay.scope'),
+                'token_type'   => 'Bearer',
+            ],
+            'invoiceId'       => $token['invoice_id'],
+            'amount'          => (float) $order->amount,
+            'terminal'        => config('epay.terminal_id'),
+            'payformJsUrl'    => config('epay.payform_js_url'),
+            'backLink'        => config('epay.back_link'),
+            'failureBackLink' => config('epay.failure_back_link'),
+            'postLink'        => config('epay.post_link'),
+            'failurePostLink' => config('epay.failure_post_link'),
+        ];
+    }
+
+    public function handlePostLinkCallback(array $payload): array
+    {
+        $invoiceId = (string) ($payload['invoiceId'] ?? '');
+
+        $order = $this->orderRepository->findByEpayInvoiceId($invoiceId);
+
+        if (! $order) {
+            Log::warning('Epay postLink: заказ не найден по invoiceId', ['invoiceId' => $invoiceId]);
+
+            throw new DomainException('Заказ не найден', 404);
+        }
+
+        $receivedHash = (string) ($payload['secret_hash'] ?? '');
+
+        if (! $this->isSignatureValid($order->orderId, $receivedHash)) {
+            Log::warning('Epay postLink: неверный secret_hash', ['orderId' => $order->orderId]);
+
+            throw new DomainException('Неверная подпись', 403);
+        }
+
+        $isSuccess = ($payload['code'] ?? null) === 'ok';
+
+        $this->orderRepository->updateStatus($order->orderId, $isSuccess ? 'paid' : 'failed');
+
+        return ['status' => 'received'];
+    }
+
+    private function requestPaymentToken(int $orderId, float $amount): array
+    {
+        $invoiceId  = $this->buildInvoiceId();
         $secretHash = $this->buildSecretHash($orderId);
 
         $response = Http::asForm()->post(config('epay.oauth_url'), [
@@ -47,6 +108,11 @@ class PaymentService
             'invoice_id'   => $invoiceId,
             'secret_hash'  => $secretHash,
         ];
+    }
+
+    private function isSignatureValid(int $orderId, string $receivedHash): bool
+    {
+        return hash_equals($this->buildSecretHash($orderId), $receivedHash);
     }
 
     private function buildInvoiceId(): string
