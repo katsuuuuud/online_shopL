@@ -64,4 +64,9 @@ class OrderRepository implements OrderRepositoryInterface
     {
         return Order::where('epay_invoice_id', $invoiceId)->first();
     }
+
+    public function getItems(int $orderId): Collection
+    {
+        return OrderItem::where('order_id', $orderId)->get();
+    }
 }

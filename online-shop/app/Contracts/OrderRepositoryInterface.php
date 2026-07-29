@@ -14,4 +14,5 @@ interface OrderRepositoryInterface
     public function updateStatus(int $orderId, string $status): void;
     public function setEpayInvoiceId(int $orderId, string $invoiceId): void;
     public function findByEpayInvoiceId(string $invoiceId): ?Order;
+    public function getItems(int $orderId): Collection;
 }

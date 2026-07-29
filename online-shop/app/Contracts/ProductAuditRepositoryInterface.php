@@ -5,4 +5,5 @@ namespace App\Contracts;
 interface ProductAuditRepositoryInterface
 {
     public function decrementStock(int $productId, int $quantity): bool;
+    public function hasStock(int $productId, int $quantity): bool;
 }

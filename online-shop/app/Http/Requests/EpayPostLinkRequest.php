@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Contracts\OrderRepositoryInterface;
 use Illuminate\Foundation\Http\FormRequest;
 use \Illuminate\Contracts\Validation\Validator;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -9,6 +10,12 @@ use Illuminate\Support\Facades\Log;
 
 class EpayPostLinkRequest extends FormRequest
 {
+    public function __construct(
+        private OrderRepositoryInterface $orderRepository,
+    ) {
+        parent::__construct();
+    }
+
     public function authorize(): bool
     {
         return true;
@@ -60,6 +67,39 @@ class EpayPostLinkRequest extends FormRequest
             'secret_hash.required' => 'secret_hash отсутствует.',
             'code.required'        => 'code отсутствует.',
         ];
+    }
+
+    public function withValidator(Validator $validator): void
+    {
+        $validator->after(function (Validator $validator) {
+            $isSuccess = $this->input('code') === 'ok';
+
+            if (! $isSuccess) {
+                return;
+            }
+
+            $receivedAmount = $this->input('amount');
+
+            if ($receivedAmount === null) {
+                return;
+            }
+
+            $order = $this->orderRepository->findByEpayInvoiceId((string) $this->input('invoiceId'));
+
+            if (! $order) {
+                return;
+            }
+
+            if ((float) $receivedAmount !== (float) $order->amount) {
+                Log::warning('Epay postLink: сумма платежа не совпадает с суммой заказа', [
+                    'orderId'  => $order->orderId,
+                    'expected' => $order->amount,
+                    'received' => $receivedAmount,
+                ]);
+
+                $validator->errors()->add('amount', 'Сумма платежа не совпадает с суммой заказа.');
+            }
+        });
     }
 
     protected function failedValidation(Validator $validator): void
