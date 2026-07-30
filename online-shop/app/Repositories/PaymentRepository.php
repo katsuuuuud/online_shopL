@@ -67,7 +67,7 @@ class PaymentRepository implements PaymentRepositoryInterface
             'event_type'      => 'webhook_received',
             'direction'       => 'incoming',
             'http_status'     => $httpStatus,
-            'request_payload' => $payload,
+            'request_payload' => Arr::except($payload, ['secret_hash']),
             'signature_valid' => $signatureValid,
             'ip_address'      => $ip,
         ]);
