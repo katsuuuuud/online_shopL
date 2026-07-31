@@ -130,7 +130,7 @@ main { padding: 40px 0 0 40px; }
 
 .section-head {
     display: flex;
-    align-items: baseline;
+    align-items: center;
     gap: 16px;
     margin-bottom: 32px;
 }
@@ -141,7 +141,9 @@ main { padding: 40px 0 0 40px; }
     font-weight: 700;
     letter-spacing: -.03em;
 }
-
+.wrapper > main:only-child {
+    grid-column: 1 / -1;
+}
 .count {
     font-size: .8rem;
     color: var(--muted);
