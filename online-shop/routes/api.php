@@ -3,6 +3,7 @@
 
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\FavoritesController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\ProfileController;
@@ -12,6 +13,8 @@ Route::middleware('web')->group(function () {
     Route::post('/cart', [CartController::class, 'apiAdd']);
     Route::delete('/cart', [CartController::class, 'apiClear']);
     Route::delete('/cart/{productId}', [CartController::class, 'apiRemove']);
+    Route::post('/favorites', [FavoritesController::class, 'apiAdd'])->middleware('auth');
+    Route::delete('/favorites/{productId}', [FavoritesController::class, 'apiRemove'])->middleware('auth');
     Route::post('/auth/login', [AuthController::class, 'apiLogin']);
     Route::post('/auth/register', [AuthController::class, 'apiRegister']);
     Route::post('/orders', [OrderController::class, 'apiCreate'])->middleware('auth');

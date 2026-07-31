@@ -16,6 +16,7 @@
     <span class="header-meta">@yield('header-meta', 'КАТАЛОГ')</span>
 
     @auth
+        <a class="btn" href="{{ url('favorites') }}">Избранное</a>
         <a class="btn" href="{{ url('cart') }}">Корзина</a>
         <a class="btn" href="{{ url('profile') }}">Кабинет</a>
         <form action="{{ route('auth.logout') }}" method="POST" style="display:inline">

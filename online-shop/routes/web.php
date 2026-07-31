@@ -4,10 +4,12 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\CatalogController;
+use App\Http\Controllers\FavoritesController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/cart', [CartController::class, 'show'])->name('cart.show');
+Route::get('/favorites', [FavoritesController::class, 'show'])->name('favorites.show')->middleware('auth');
 Route::post('/auth/logout', [AuthController::class, 'logout'])->name('auth.logout')->middleware('auth');
 Route::get('/auth', function () {
     $next = request()->query('next', '/');

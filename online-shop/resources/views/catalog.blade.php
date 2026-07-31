@@ -51,6 +51,11 @@
                             <span class="tag tag-out-of-stock">нет на складе</span>
                         @endif
 
+                        @auth
+                            <button type="button" class="btn add-to-favorites"
+                                    data-product-id="{{ $productId }}">♡</button>
+                        @endauth
+
                         <div class="card-img"></div>
 
                         <div>
