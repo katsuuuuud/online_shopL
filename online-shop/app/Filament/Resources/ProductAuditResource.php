@@ -2,9 +2,9 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
+use App\Filament\Resources\ProductAuditResource\Pages;
+use App\Filament\Resources\ProductAuditResource\RelationManagers;
+use App\Models\ProductAudit;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -15,9 +15,9 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UserResource extends Resource
+class ProductAuditResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = ProductAudit::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -25,11 +25,8 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name'),
-                TextInput::make('email')->email(),
-                TextInput::make('phone'),
-                TextInput::make('address'),
-                TextInput::make('password')->password()
+                TextInput::make('product_id'),
+                TextInput::make('quantity'),
             ]);
     }
 
@@ -37,11 +34,8 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
-                TextColumn::make('phone'),
-                TextColumn::make('address'),
-                TextColumn::make('password'),
+                TextColumn::make('product_id'),
+                TextColumn::make('quantity'),
             ])
             ->filters([
                 //
@@ -66,9 +60,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListProductAudits::route('/'),
+            'create' => Pages\CreateProductAudit::route('/create'),
+            'edit' => Pages\EditProductAudit::route('/{record}/edit'),
         ];
     }
 }

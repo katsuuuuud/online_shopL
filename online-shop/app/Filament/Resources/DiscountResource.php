@@ -2,24 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductResource\Pages;
-use App\Filament\Resources\ProductResource\RelationManagers;
-use App\Models\Product;
+use App\Filament\Resources\DiscountResource\Pages;
+use App\Filament\Resources\DiscountResource\RelationManagers;
+use App\Models\Discount;
 use Filament\Forms;
-use Filament\Forms\Components\Select;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ProductResource extends Resource
+class DiscountResource extends Resource
 {
-    protected static ?string $model = Product::class;
+    protected static ?string $model = Discount::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -27,20 +27,10 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name')
-                    ->required(),
-                Textarea::make('description')
-                    ->columnSpanFull(),
-                Select::make('category_id')
-                    ->label('Category')
-                    ->relationship('category', 'name')
-                    ->searchable()
-                    ->preload(),
-                Select::make('discount_id')
-                    ->label('Discount')
-                    ->relationship('discount', 'description')
-                    ->searchable()
-                    ->preload(),
+                TextInput::make('description'),
+                TextInput::make('discount_value'),
+                TextInput::make('type'),
+                Toggle::make('is_active'),
             ]);
     }
 
@@ -48,10 +38,10 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
                 TextColumn::make('description'),
-                TextColumn::make('category.name'),
-                TextColumn::make('discount.description'),
+                TextColumn::make('discount_value'),
+                TextColumn::make('type'),
+                IconColumn::make('is_active')->boolean(),
             ])
             ->filters([
                 //
@@ -76,9 +66,9 @@ class ProductResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProducts::route('/'),
-            'create' => Pages\CreateProduct::route('/create'),
-            'edit' => Pages\EditProduct::route('/{record}/edit'),
+            'index' => Pages\ListDiscounts::route('/'),
+            'create' => Pages\CreateDiscount::route('/create'),
+            'edit' => Pages\EditDiscount::route('/{record}/edit'),
         ];
     }
 }

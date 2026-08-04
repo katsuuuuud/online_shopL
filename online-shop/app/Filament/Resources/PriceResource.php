@@ -2,22 +2,24 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\UserResource\Pages;
-use App\Filament\Resources\UserResource\RelationManagers;
-use App\Models\User;
+use App\Filament\Resources\PriceResource\Pages;
+use App\Filament\Resources\PriceResource\RelationManagers;
+use App\Models\Price;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\IconColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class UserResource extends Resource
+class PriceResource extends Resource
 {
-    protected static ?string $model = User::class;
+    protected static ?string $model = Price::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 
@@ -25,11 +27,11 @@ class UserResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('name'),
-                TextInput::make('email')->email(),
-                TextInput::make('phone'),
-                TextInput::make('address'),
-                TextInput::make('password')->password()
+                TextInput::make('product_id'),
+                TextInput::make('price'),
+                TextInput::make('currency'),
+                TextInput::make('date'),
+                Toggle::make('is_active'),
             ]);
     }
 
@@ -37,11 +39,11 @@ class UserResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('name'),
-                TextColumn::make('email'),
-                TextColumn::make('phone'),
-                TextColumn::make('address'),
-                TextColumn::make('password'),
+                TextColumn::make('product_id'),
+                TextColumn::make('price'),
+                TextColumn::make('currency'),
+                TextColumn::make('date'),
+                IconColumn::make('is_active')->boolean(),
             ])
             ->filters([
                 //
@@ -66,9 +68,9 @@ class UserResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListUsers::route('/'),
-            'create' => Pages\CreateUser::route('/create'),
-            'edit' => Pages\EditUser::route('/{record}/edit'),
+            'index' => Pages\ListPrices::route('/'),
+            'create' => Pages\CreatePrice::route('/create'),
+            'edit' => Pages\EditPrice::route('/{record}/edit'),
         ];
     }
 }
