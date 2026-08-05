@@ -52,8 +52,10 @@
                         @endif
 
                         @auth
-                            <button type="button" class="btn add-to-favorites"
-                                    data-product-id="{{ $productId }}">♡</button>
+                            @php $isFavorite = in_array($productId, $favoriteIds ?? []); @endphp
+                            <button type="button"
+                                    class="btn add-to-favorites {{ $isFavorite ? 'active' : '' }}"
+                                    data-product-id="{{ $productId }}">{{ $isFavorite ? '♥' : '♡' }}</button>
                         @endauth
 
                         <div class="card-img"></div>

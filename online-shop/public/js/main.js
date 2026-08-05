@@ -84,12 +84,27 @@ async function onRemoveFromCart(productId) {
     }
 }
 
-async function onAddToFavorites(productId) {
+async function onToggleFavorite(btn) {
+    const productId = +btn.dataset.productId;
+    const isActive = btn.classList.contains('active');
+
+    btn.disabled = true;
     try {
-        await api.post('/api/favorites', { productId });
-        showToast('Товар добавлен в избранное');
+        if (isActive) {
+            await api.delete(`/api/favorites/${productId}`);
+            btn.classList.remove('active');
+            btn.textContent = '♡';
+            showToast('Товар удалён из избранного');
+        } else {
+            await api.post('/api/favorites', { productId });
+            btn.classList.add('active');
+            btn.textContent = '♥';
+            showToast('Товар добавлен в избранное');
+        }
     } catch (e) {
         showToast(e.message, 'error');
+    } finally {
+        btn.disabled = false;
     }
 }
 
@@ -248,7 +263,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     document.querySelectorAll('.add-to-favorites').forEach(btn => {
-        btn.addEventListener('click', () => onAddToFavorites(+btn.dataset.productId));
+        btn.addEventListener('click', () => onToggleFavorite(btn));
     });
 
     document.querySelectorAll('.remove-from-favorites').forEach(btn => {

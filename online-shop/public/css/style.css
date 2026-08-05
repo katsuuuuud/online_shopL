@@ -236,6 +236,29 @@ main { padding: 40px 0 0 40px; }
     color: #0d0d0d;
 }
 
+.add-to-favorites {
+    color: var(--muted);
+    font-size: 1.2rem;
+    padding: 0 12px;
+}
+
+.add-to-favorites:hover {
+    background: transparent;
+    border-color: #e0245e;
+    color: #e0245e;
+}
+
+.add-to-favorites.active {
+    color: #e0245e;
+    border-color: #e0245e;
+}
+
+.add-to-favorites.active:hover {
+    background: #e0245e;
+    color: #fff;
+}
+
+
 .tag {
     position: absolute;
     top: 12px; right: 12px;
