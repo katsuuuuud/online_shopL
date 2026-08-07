@@ -5,7 +5,6 @@ namespace App\Services;
 
 use App\Contracts\OrderRepositoryInterface;
 use App\Contracts\PaymentRepositoryInterface;
-use App\Contracts\ProductAuditRepositoryInterface;
 use App\Exceptions\DomainException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
@@ -16,7 +15,6 @@ class PaymentService
     public function __construct(
         private OrderRepositoryInterface $orderRepository,
         private PaymentRepositoryInterface $paymentRepository,
-        private ProductAuditRepositoryInterface $productAuditRepository,
     ) {}
 
     public function createPaymentToken(int $orderId, int $userId): array
@@ -87,16 +85,10 @@ class PaymentService
         $isSuccess = ($payload['code'] ?? null) === 'ok';
         $status    = $isSuccess ? 'paid' : 'failed';
 
-        $alreadyPaid = $order->status === 'paid';
-
         DB::beginTransaction();
 
         try {
             $this->orderRepository->updateStatus($order->orderId, $status);
-
-            if ($isSuccess && ! $alreadyPaid) {
-                $this->decrementStockForOrder($order->orderId);
-            }
 
             if ($transaction) {
                 $this->paymentRepository->markAsPaidOrFailed($transaction, $payload, $status, $isSuccess);
@@ -119,19 +111,6 @@ class PaymentService
         }
 
         return ['status' => 'received'];
-    }
-
-    private function decrementStockForOrder(int $orderId): void
-    {
-        $items = $this->orderRepository->getItems($orderId);
-
-        foreach ($items as $item) {
-            if (! $this->productAuditRepository->decrementStock($item->product_id, $item->quantity)) {
-                throw new \RuntimeException(
-                    'Не удалось списать остаток по товару #' . $item->product_id . ' для заказа #' . $orderId
-                );
-            }
-        }
     }
 
     private function requestPaymentToken(int $orderId, float $amount): array

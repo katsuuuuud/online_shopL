@@ -6,6 +6,7 @@ namespace App\Repositories;
 use App\Contracts\PaymentRepositoryInterface;
 use App\Models\Transaction;
 use App\Models\TransactionLog;
+use Illuminate\Support\Arr;
 
 class PaymentRepository implements PaymentRepositoryInterface
 {

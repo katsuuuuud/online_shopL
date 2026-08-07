@@ -15,11 +15,4 @@ class ProductAuditRepository implements ProductAuditRepositoryInterface
 
         return $updated > 0;
     }
-
-    public function hasStock(int $productId, int $quantity): bool
-    {
-        return ProductAudit::where('product_id', $productId)
-            ->where('quantity', '>=', $quantity)
-            ->exists();
-    }
 }

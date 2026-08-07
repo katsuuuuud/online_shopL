@@ -58,7 +58,7 @@ class CreateOrderAction
                     throw new \RuntimeException('Некорректные данные товара в корзине.');
                 }
 
-                if (! $this->productAuditRepository->hasStock($productId, $quantity)) {
+                if (! $this->productAuditRepository->decrementStock($productId, $quantity)) {
                     throw new \RuntimeException(
                         'Извините, товар "' . ($item['name'] ?? 'товар') . '" закончился'
                     );
