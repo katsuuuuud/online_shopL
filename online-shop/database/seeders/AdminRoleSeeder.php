@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Role;
+use Spatie\Permission\Models\Permission;
 
 class AdminRoleSeeder extends Seeder
 {
@@ -14,12 +15,11 @@ class AdminRoleSeeder extends Seeder
      */
     public function run(): void
     {
-        $adminRole = Role::firstOrCreate(['name' => 'admin']);
+        $role_admin = Role::firstOrCreate(['name' => 'admin']);
+        $permission_manage_users = Permission::create(['name' => 'manage users']);
 
+        $role_admin->givePermissionTo($permission_manage_users);
         $user = User::where('email', 'fine@s.com')->first();
-
-        if ($user) {
-            $user->assignRole($adminRole);
-        }
+        $user->assignRole($role_admin);
     }
 }
