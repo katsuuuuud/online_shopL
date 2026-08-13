@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\ProductAudit;
+use App\Models\Stock;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ class OrderTest extends TestCase
 
         $product = Product::factory()->create();
 
-        ProductAudit::create([
+        Stock::create([
             'product_id' => $product->productId,
             'quantity'   => $stock,
         ]);
@@ -118,8 +118,8 @@ class OrderTest extends TestCase
         $productA = Product::factory()->create();
         $productB = Product::factory()->create();
 
-        ProductAudit::create(['product_id' => $productA->productId, 'quantity' => 5]);
-        ProductAudit::create(['product_id' => $productB->productId, 'quantity' => 5]);
+        Stock::create(['product_id' => $productA->productId, 'quantity' => 5]);
+        Stock::create(['product_id' => $productB->productId, 'quantity' => 5]);
 
         CartItem::create([
             'cart_id'    => $cart->cartId,
@@ -161,7 +161,7 @@ class OrderTest extends TestCase
         ]);
         $product = Product::factory()->create(['discount_id' => $discount->discountId]);
 
-        ProductAudit::create(['product_id' => $product->productId, 'quantity' => 5]);
+        Stock::create(['product_id' => $product->productId, 'quantity' => 5]);
 
         $cart = Cart::create(['user_id' => $user->userId]);
         CartItem::create([
@@ -198,7 +198,7 @@ class OrderTest extends TestCase
         ]);
         $product = Product::factory()->create(['discount_id' => $discount->discountId]);
 
-        ProductAudit::create(['product_id' => $product->productId, 'quantity' => 5]);
+        Stock::create(['product_id' => $product->productId, 'quantity' => 5]);
 
         $cart = Cart::create(['user_id' => $user->userId]);
         CartItem::create([

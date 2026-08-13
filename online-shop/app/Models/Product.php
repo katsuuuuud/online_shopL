@@ -35,13 +35,18 @@ class Product extends Model
             ->where('is_active', 1);
     }
 
-    public function audit()
-    {
-        return $this->hasOne(ProductAudit::class, 'product_id', 'productId');
-    }
-
     public function cartItems()
     {
         return $this->hasMany(CartItem::class, 'product_id', 'productId');
+    }
+
+    public function colors()
+    {
+        return $this->hasMany(ProductColor::class, 'product_id', 'productId');
+    }
+
+    public function tags()
+    {
+        return $this->belongsToMany(Tag::class, 'product_tags', 'product_id', 'tag_id', 'productId', 'tagId');
     }
 }

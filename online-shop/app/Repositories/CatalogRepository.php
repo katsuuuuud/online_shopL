@@ -6,7 +6,7 @@ use App\Contracts\CatalogRepositoryInterface;
 use App\Models\Category;
 use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductAudit;
+use App\Models\Stock;
 use Illuminate\Database\Eloquent\Collection;
 
 class CatalogRepository implements CatalogRepositoryInterface
@@ -48,7 +48,7 @@ class CatalogRepository implements CatalogRepositoryInterface
 
     public function getStockQuantities(array $productIds): Collection
     {
-        return ProductAudit::whereIn('product_id', $productIds)
+        return Stock::whereIn('product_id', $productIds)
             ->get()
             ->keyBy('product_id');
     }

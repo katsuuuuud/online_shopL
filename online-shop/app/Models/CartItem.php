@@ -12,7 +12,7 @@ class CartItem extends Model
     public $timestamps = false;
     protected $fillable = [
         'cart_id',
-        'product_id',
+        'variant_id',
         'quantity',
         'price',
         'currency',
@@ -28,8 +28,8 @@ class CartItem extends Model
         return $this->belongsTo(Cart::class, 'cart_id', 'cartId');
     }
 
-    public function product(): BelongsTo
+    public function variant(): BelongsTo
     {
-        return $this->belongsTo(Product::class, 'product_id', 'productId');
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'variantId');
     }
 }

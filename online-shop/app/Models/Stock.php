@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductAudit extends Model
+class Stock extends Model
 {
     protected $table = 'product_audit';
     protected $primaryKey = 'auditId';

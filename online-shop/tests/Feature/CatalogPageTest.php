@@ -7,7 +7,7 @@ use App\Models\CartItem;
 use App\Models\Category;
 use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductAudit;
+use App\Models\Stock;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -45,7 +45,7 @@ class CatalogPageTest extends TestCase
         $user    = User::factory()->create();
         $product = $this->createProductWithPrice();
 
-        ProductAudit::create([
+        Stock::create([
             'product_id' => $product->productId,
             'quantity'   => 2,
         ]);
@@ -66,7 +66,7 @@ class CatalogPageTest extends TestCase
         $user    = User::factory()->create();
         $product = $this->createProductWithPrice();
 
-        ProductAudit::create([
+        Stock::create([
             'product_id' => $product->productId,
             'quantity'   => 0,
         ]);

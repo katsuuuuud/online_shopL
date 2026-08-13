@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Category;
 use App\Models\Price;
 use App\Models\Product;
-use App\Models\ProductAudit;
+use App\Models\Stock;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Foundation\Testing\WithFaker;
@@ -36,7 +36,7 @@ class CartTest extends TestCase
             'is_active'  => true,
         ]);
 
-        ProductAudit::create([
+        Stock::create([
             'product_id' => $product->productId,
             'quantity'   => $stock,
         ]);

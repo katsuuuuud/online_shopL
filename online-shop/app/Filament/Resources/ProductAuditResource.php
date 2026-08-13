@@ -4,7 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ProductAuditResource\Pages;
 use App\Filament\Resources\ProductAuditResource\RelationManagers;
-use App\Models\ProductAudit;
+use App\Models\Stock;
 use Filament\Forms;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ProductAuditResource extends Resource
 {
-    protected static ?string $model = ProductAudit::class;
+    protected static ?string $model = Stock::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
 

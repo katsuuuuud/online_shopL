@@ -5,7 +5,7 @@ namespace Tests\Feature;
 use App\Models\Cart;
 use App\Models\CartItem;
 use App\Models\Product;
-use App\Models\ProductAudit;
+use App\Models\Stock;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -20,7 +20,7 @@ class OrderTest extends TestCase
 
         $product = Product::factory()->create();
 
-        ProductAudit::create([
+        Stock::create([
             'product_id' => $product->productId,
             'quantity'   => $stock,
         ]);
