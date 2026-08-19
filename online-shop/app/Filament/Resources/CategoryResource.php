@@ -6,6 +6,7 @@ use App\Filament\Resources\CategoryResource\Pages;
 use App\Filament\Resources\CategoryResource\RelationManagers;
 use App\Models\Category;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -26,7 +27,14 @@ class CategoryResource extends Resource
         return $form
             ->schema([
                 TextInput::make('name'),
-                TextInput::make('description'),
+                Select::make('main_category')
+                    ->label('Раздел')
+                    ->options([
+                        'women' => 'Women',
+                        'men' => 'Men',
+                        'unisex' => 'Unisex',
+                    ])
+                    ->native(false),
             ]);
     }
 
@@ -35,10 +43,30 @@ class CategoryResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('name'),
-                TextColumn::make('description'),
+                TextColumn::make('main_category')
+                    ->label('Раздел')
+                    ->badge()
+                    ->formatStateUsing(fn (?string $state) => match ($state) {
+                        'women' => 'Women',
+                        'men' => 'Men',
+                        'unisex' => 'Unisex',
+                        default => '—',
+                    })
+                    ->color(fn (?string $state) => match ($state) {
+                        'women' => 'danger',
+                        'men' => 'info',
+                        'unisex' => 'success',
+                        default => 'gray',
+                    }),
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('main_category')
+                    ->label('Раздел')
+                    ->options([
+                        'women' => 'Women',
+                        'men' => 'Men',
+                        'unisex' => 'Unisex',
+                    ]),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),

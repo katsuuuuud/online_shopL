@@ -6,14 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 
 class Stock extends Model
 {
-    protected $table = 'product_audit';
-    protected $primaryKey = 'auditId';
+    protected $table = 'stock';
+    protected $primaryKey = 'stockId';
     public $timestamps = false;
 
-    protected $fillable = ['product_id', 'quantity'];
+    protected $fillable = ['variant_id', 'quantity'];
 
-    public function product()
+    public function variant()
     {
-        return $this->belongsTo(Product::class, 'product_id', 'productId');
+        return $this->belongsTo(ProductVariant::class, 'variant_id', 'variantId');
     }
 }

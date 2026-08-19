@@ -17,6 +17,11 @@ class Product extends Model
         'description',
         'category_id',
         'discount_id',
+        'has_variant',
+    ];
+
+    protected $casts = [
+        'has_variant' => 'boolean',
     ];
 
     public function category()

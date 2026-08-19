@@ -12,7 +12,7 @@ class Category extends Model
     protected $primaryKey = 'categoryId';
     public $timestamps = false;
 
-    protected $fillable = ['name', 'description'];
+    protected $fillable = ['name', 'main_category'];
 
     public function products(): HasMany
     {

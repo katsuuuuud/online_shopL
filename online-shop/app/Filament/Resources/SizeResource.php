@@ -2,31 +2,29 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\ProductAuditResource\Pages;
-use App\Filament\Resources\ProductAuditResource\RelationManagers;
-use App\Models\Stock;
-use Filament\Forms;
+use App\Filament\Resources\SizeResource\Pages;
+use App\Models\Size;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class ProductAuditResource extends Resource
+class SizeResource extends Resource
 {
-    protected static ?string $model = Stock::class;
+    protected static ?string $model = Size::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-arrows-pointing-out';
+
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                TextInput::make('product_id'),
-                TextInput::make('quantity'),
+                TextInput::make('name')
+                    ->required()
+                    ->maxLength(20),
             ]);
     }
 
@@ -34,8 +32,16 @@ class ProductAuditResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('product_id'),
-                TextColumn::make('quantity'),
+                TextColumn::make('sizeId')
+                    ->label('ID')
+                    ->sortable(),
+                TextColumn::make('name')
+                    ->searchable()
+                    ->sortable(),
+                TextColumn::make('variants_count')
+                    ->label('Variants')
+                    ->counts('variants')
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -60,9 +66,9 @@ class ProductAuditResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListProductAudits::route('/'),
-            'create' => Pages\CreateProductAudit::route('/create'),
-            'edit' => Pages\EditProductAudit::route('/{record}/edit'),
+            'index' => Pages\ListSizes::route('/'),
+            'create' => Pages\CreateSize::route('/create'),
+            'edit' => Pages\EditSize::route('/{record}/edit'),
         ];
     }
 }

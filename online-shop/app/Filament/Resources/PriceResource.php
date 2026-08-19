@@ -6,6 +6,7 @@ use App\Filament\Resources\PriceResource\Pages;
 use App\Filament\Resources\PriceResource\RelationManagers;
 use App\Models\Price;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Form;
@@ -27,9 +28,18 @@ class PriceResource extends Resource
     {
         return $form
             ->schema([
-                TextInput::make('product_id'),
-                TextInput::make('price'),
-                TextInput::make('currency'),
+                Select::make('product_id')
+                    ->label('Product')
+                    ->relationship('product', 'name')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                TextInput::make('price')
+                    ->numeric()
+                    ->required(),
+                TextInput::make('currency')
+                    ->maxLength(3)
+                    ->required(),
                 TextInput::make('date'),
                 Toggle::make('is_active'),
             ]);
@@ -39,7 +49,8 @@ class PriceResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('product_id'),
+                TextColumn::make('product.name')
+                    ->label('Product'),
                 TextColumn::make('price'),
                 TextColumn::make('currency'),
                 TextColumn::make('date'),

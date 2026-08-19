@@ -2,10 +2,11 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\OrderResource\Pages;
-use App\Filament\Resources\OrderResource\RelationManagers;
-use App\Models\Order;
+use App\Filament\Resources\StockResource\Pages;
+use App\Models\Stock;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
@@ -14,17 +15,28 @@ use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 
-class OrderResource extends Resource
+class StockResource extends Resource
 {
-    protected static ?string $model = Order::class;
+    protected static ?string $model = Stock::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+
+    protected static ?string $navigationLabel = 'Stock';
 
     public static function form(Form $form): Form
     {
         return $form
             ->schema([
-                //
+                Select::make('variant_id')
+                    ->label('Variant (SKU)')
+                    ->relationship('variant', 'sku')
+                    ->searchable()
+                    ->preload()
+                    ->required(),
+                TextInput::make('quantity')
+                    ->numeric()
+                    ->default(0)
+                    ->required(),
             ]);
     }
 
@@ -32,11 +44,11 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                TextColumn::make('created_at'),
-                TextColumn::make('amount'),
-                TextColumn::make('status'),
-                TextColumn::make('customer_id'),
-                TextColumn::make('address'),
+                TextColumn::make('variant.sku')
+                    ->label('SKU')
+                    ->searchable(),
+                TextColumn::make('quantity')
+                    ->sortable(),
             ])
             ->filters([
                 //
@@ -61,9 +73,9 @@ class OrderResource extends Resource
     public static function getPages(): array
     {
         return [
-            'index' => Pages\ListOrders::route('/'),
-            'create' => Pages\CreateOrder::route('/create'),
-            'edit' => Pages\EditOrder::route('/{record}/edit'),
+            'index' => Pages\ListStocks::route('/'),
+            'create' => Pages\CreateStock::route('/create'),
+            'edit' => Pages\EditStock::route('/{record}/edit'),
         ];
     }
 }

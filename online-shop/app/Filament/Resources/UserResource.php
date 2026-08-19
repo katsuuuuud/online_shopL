@@ -6,6 +6,7 @@ use App\Filament\Resources\UserResource\Pages;
 use App\Filament\Resources\UserResource\RelationManagers;
 use App\Models\User;
 use Filament\Forms;
+use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -19,7 +20,7 @@ class UserResource extends Resource
 {
     protected static ?string $model = User::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-user';
 
     public static function form(Form $form): Form
     {
@@ -29,7 +30,17 @@ class UserResource extends Resource
                 TextInput::make('email')->email(),
                 TextInput::make('phone'),
                 TextInput::make('address'),
-                TextInput::make('password')->password()
+                TextInput::make('password')
+                    ->password()
+                    ->dehydrated(fn (?string $state) => filled($state))
+                    ->required(fn (string $context) => $context === 'create')
+                    ->helperText('Оставьте пустым, чтобы не менять пароль'),
+                Select::make('roles')
+                    ->label('Роли')
+                    ->relationship('roles', 'name')
+                    ->multiple()
+                    ->searchable()
+                    ->preload(),
             ]);
     }
 
@@ -41,7 +52,9 @@ class UserResource extends Resource
                 TextColumn::make('email'),
                 TextColumn::make('phone'),
                 TextColumn::make('address'),
-                TextColumn::make('password'),
+                TextColumn::make('roles.name')
+                    ->label('Роли')
+                    ->badge(),
             ])
             ->filters([
                 //
